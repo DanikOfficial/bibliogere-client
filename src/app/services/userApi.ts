@@ -1,7 +1,13 @@
-import { apiSlice } from '../../features/api/apiSlice'
+import { api } from '../../features/api/apiSlice'
 import axios from 'axios'
-import { BaseQueryApi } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
-import { createApi, FetchArgs } from '@reduxjs/toolkit/dist/query'
+
+export interface ErrorState {
+  error: true | false
+  message: string | null
+  errors: {
+    username: string | null
+  }
+}
 
 export interface LoginRequest {
   username: string
@@ -15,13 +21,6 @@ export interface UserData {
   permissoes: []
 }
 
-export interface Error {
-  status: number
-  campos?: {
-    username: string
-  }
-}
-
 interface ApiResponse {
   status: number
   error: boolean
@@ -29,14 +28,12 @@ interface ApiResponse {
   data: UserData | Error
 }
 
-export const userApi = apiSlice.injectEndpoints({
+export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
     login: build.mutation({
-      queryFn: async (args: LoginRequest, api, extraOptions, baseQuery) => {
+      queryFn: async (args: LoginRequest) => {
         const request = await axios.post('/api/v1/utilizador/entrar', args)
         const data = request.data
-
-        console.log(data)
 
         return data.error ? { error: data } : data
       },
