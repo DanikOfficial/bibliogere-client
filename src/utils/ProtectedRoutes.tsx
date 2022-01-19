@@ -8,7 +8,7 @@ const ProtectedRoutes: React.FC = () => {
   //Testing only
   const logged = true
 
-  return logged ? <Outlet /> : <Navigate to="/user/login" />
+  return logged ? <Outlet /> : <Navigate to="/" />
 }
 
 export default ProtectedRoutes
