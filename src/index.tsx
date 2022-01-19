@@ -7,6 +7,17 @@ import './assets/main.min.css'
 import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
 
+import localizacaoApi from './features/localizacoes/localizacaoApi'
+import estanteApi from './features/estantes/estanteApi'
+
+// Initialize
+
+// Localizações
+store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
+
+// Estantes
+store.dispatch(estanteApi.endpoints.getEstantes.initiate())
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
