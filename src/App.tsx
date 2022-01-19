@@ -1,4 +1,3 @@
-import Hero from './components/hero/Hero'
 import { BrowserRouter as Router } from 'react-router-dom'
 import CustomRoutes from './utils/Routes'
 
