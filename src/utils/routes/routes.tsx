@@ -3,6 +3,7 @@ import Login from '../../features/user/login/Login'
 import ProtectedRoutes from '../ProtectedRoutes'
 import type { RouteObject } from 'react-router-dom'
 import Hero from '../../components/hero/Hero'
+import Obras from '../../features/obra/Obras'
 
 const routes: RouteObject[] = [
   {
@@ -19,6 +20,7 @@ const routes: RouteObject[] = [
         children: [
           {
             path: 'obras',
+            element: <Obras />,
           },
         ],
       },
