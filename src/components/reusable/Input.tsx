@@ -3,68 +3,43 @@ import React from 'react'
 interface Props {
   name: string
   type: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
   placeholder: string
   error?: string | null
   color: string
   reference?: React.RefObject<HTMLInputElement>
-  value?: ''
 }
 
-const Input: React.FC<Props> = ({
+let Input: React.FC<Props> = ({
   name,
-  value = '',
   type,
   onChange,
   placeholder,
-  error = '',
+  error,
   color,
   reference,
 }) => {
   let content: JSX.Element = <></>
 
-  if (value) {
-    content = (
-      <input
-        value={value}
-        type={type}
-        className={`form-control
-                  placeholder-${color}
-                  border-end-0
-                  border-top-0
-                  border-start-0
-                  border-2
-                  border-${color}
-                  text-${color}
-                  shadow-none
-                  `}
-        onChange={onChange}
-        name={name}
-        placeholder={placeholder}
-        ref={reference}
-      />
-    )
-  } else {
-    content = (
-      <input
-        type={type}
-        className={`form-control
-                placeholder-${color}
-                border-end-0
-                border-top-0
-                border-start-0
-                border-2
-                border-${color}
-                text-${color}
-                shadow-none
-                `}
-        onChange={onChange}
-        name={name}
-        placeholder={placeholder}
-        ref={reference}
-      />
-    )
-  }
+  content = (
+    <input
+      type={type}
+      className={`form-control
+              placeholder-${color}
+              border-end-0
+              border-top-0
+              border-start-0
+              border-2
+              border-${color}
+              text-${color}
+              shadow-none
+              `}
+      onChange={onChange}
+      name={name}
+      placeholder={placeholder}
+      ref={reference}
+    />
+  )
 
   return (
     <>
@@ -75,5 +50,7 @@ const Input: React.FC<Props> = ({
     </>
   )
 }
+
+Input = React.memo(Input)
 
 export default Input
