@@ -1,20 +1,12 @@
-import React, { useState, FC } from 'react'
+import React, { useState, FC, useMemo } from 'react'
 import { useAppDispatch } from '../../../app/hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useLoginMutation } from '../../../app/services/userApi'
 import { setCredentials } from '../userSlice'
 import type { AuthState } from '../userSlice'
 
-import type { LoginRequest } from '../../../app/services/userApi'
+import type { LoginRequest, ErrorState } from '../../../app/services/userApi'
 import Input from '../../../components/reusable/Input'
-
-type ErrorState = {
-  error: true | false
-  message: string | null
-  errors: {
-    username: string | null
-  }
-}
 
 const Credentials: FC = () => {
   const dispatch = useAppDispatch()
@@ -35,7 +27,10 @@ const Credentials: FC = () => {
 
   const [login, { isLoading, isError }] = useLoginMutation()
 
-  const canLogin: boolean = Object.values(formState).every(Boolean)
+  const canLogin: boolean = useMemo(
+    () => Object.values(formState).every(Boolean),
+    [formState]
+  )
 
   const handleOnChange = ({
     target: { name, value },
@@ -58,8 +53,8 @@ const Credentials: FC = () => {
 
         navigate('/dashboard/obras')
       } catch (err) {
-        const data: object = { ...(err as {}) }
-        setError({ ...error, ...data })
+        const data = err as ErrorState
+        setError((prev) => ({ ...prev, ...data }))
       }
     }
   }
