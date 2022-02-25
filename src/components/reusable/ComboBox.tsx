@@ -1,5 +1,10 @@
 import React from 'react'
-import Select, { ActionMeta, SingleValue, StylesConfig } from 'react-select'
+import Select, {
+  ActionMeta,
+  GroupBase,
+  SingleValue,
+  StylesConfig,
+} from 'react-select'
 import type { Option } from '../../app/interfaces/Option'
 
 interface Props {
@@ -25,10 +30,21 @@ let ComboBox: React.FC<Props> = ({
   onChange,
   options,
 }) => {
-  const styles = {
+  const styles: StylesConfig<
+    {
+      value: string | number
+      label: string | number
+    },
+    false,
+    GroupBase<{
+      value: string | number
+      label: string | number
+    }>
+  > = {
     control: (oldStyles: any) => ({
       ...oldStyles,
       border: '2px solid #1000f2',
+      color,
     }),
   }
 
