@@ -8,7 +8,7 @@ import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
 
 import localizacaoApi from './features/localizacoes/localizacaoApi'
-import estanteApi from './features/estantes/estanteApi'
+import estanteApi from './features/estantes/data/estanteApi'
 
 // Initialize
 
