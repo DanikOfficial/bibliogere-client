@@ -1,7 +1,7 @@
 import { type } from 'os'
 import { api } from '../../api/apiSlice'
-import { Estante } from '../../estantes/EstanteInterfaces'
-import { ObraResponse, ObraRequest, SingleObra } from './ObraInterfaces'
+import { Estante } from '../../estantes/data/EstanteInterfaces'
+import { ObraEntity, ObraRequest, SingleObra } from './ObraInterfaces'
 
 const obraApi = api.injectEndpoints({
   endpoints: (build) => ({
