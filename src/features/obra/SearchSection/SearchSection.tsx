@@ -3,18 +3,21 @@ import ComboBox from '../../../components/reusable/ComboBox'
 import Input from '../../../components/reusable/Input'
 import ControlledInput from '../../../components/reusable/ControlledInput'
 import type { ObraType, FormSearchState } from '../data/ObraInterfaces'
-import { InitialAdvancedSearchState } from './SearchSectionState'
+import type { Option } from '../../../app/interfaces/Option'
 import {
-  onChangeTipoObra,
+  InitialAdvancedSearchState,
+  tipoObraOptionsInitialState,
+} from './SearchSectionState'
+import {
   onChangeAdvancedSearch,
   onChangeTitulo,
   onToggleAdvancedSearch,
+  onChangeTipoObraComboBox,
 } from './events.logic'
 
 const SearchSection: React.FC = () => {
-  const tipoObraState: ObraType = 'livro'
   const ref = useRef<HTMLInputElement>(null)
-  const [tipoObra, setTipoObra] = useState<ObraType>(tipoObraState)
+  const [tipoObra, setTipoObra] = useState<ObraType>('livro')
   const [isAdvanced, setIsAdvanced] = useState<boolean>(false)
   const [titulo, setTitulo] = useState<string>('')
   const [advancedSearchState, setAdvancedSearchState] =
@@ -22,9 +25,25 @@ const SearchSection: React.FC = () => {
 
   const canSearch = useMemo(() => Boolean(titulo), [titulo])
 
+  const tipoObraOptions = tipoObraOptionsInitialState
+
+  const [defaultTipoObra, setDefaultTipoObra] = useState<Option>(
+    tipoObraOptions[0]
+  )
+
+  const onChangeTipoObraSelect = onChangeTipoObraComboBox(
+    setTipoObra,
+    setDefaultTipoObra,
+    ref,
+    advancedSearchState
+  )
+
   useEffect(() => {
     const element = ref.current as HTMLInputElement
     const name = element.name
+
+    console.log('The name: ' + name)
+
     element.value = ''
 
     setAdvancedSearchState((prev) => ({ ...prev, [name]: '' }))
@@ -40,6 +59,8 @@ const SearchSection: React.FC = () => {
           <div className="col col-xl-7 mb-2 mb-xl-0">
             <Input
               name="titulo"
+              id="tituloSearch"
+              label="Titulo"
               color="secondary"
               onChange={(event) => onChangeTitulo(event, setTitulo)}
               type="text"
@@ -50,17 +71,15 @@ const SearchSection: React.FC = () => {
           </div>
           <div className="col-xl-3 mb-3 mb-xl-0">
             <ComboBox
+              id="tipoObra"
+              label="Tipo de Obra"
+              value={defaultTipoObra}
               color="secondary"
-              onChange={(event) =>
-                onChangeTipoObra(event, setTipoObra, ref, advancedSearchState)
-              }
-              placeholder="Escolha a obra que deseja"
-            >
-              <option value="livro">Livro</option>
-              <option value="monografia">Monografia</option>
-            </ComboBox>
+              onChange={onChangeTipoObraSelect}
+              options={tipoObraOptions}
+            />
           </div>
-          <div className="col-sm-5 col-md-4 col-lg-2 col-xl-2 d-flex">
+          <div className="col-sm-5 col-md-4 col-lg-2 col-xl-2 mt-lg-4">
             <button
               className="
             btn
@@ -104,6 +123,8 @@ const SearchSection: React.FC = () => {
             <div className="col-lg-8">
               <ControlledInput
                 name="autor"
+                id="autorSearch"
+                label="Autor"
                 color="secondary"
                 onChange={(event) =>
                   onChangeAdvancedSearch(event, setAdvancedSearchState)
@@ -120,6 +141,8 @@ const SearchSection: React.FC = () => {
             <div className="col-md-6 col-lg-3 col-xl-4 mb-2 mb-md-0">
               <ControlledInput
                 name="ano"
+                id="anoSearch"
+                label="Ano"
                 value={advancedSearchState.ano}
                 color="secondary"
                 onChange={(event) =>
@@ -132,17 +155,21 @@ const SearchSection: React.FC = () => {
             <div className="col-md-6 col-lg-4 col-xl-4">
               {tipoObra === 'livro' ? (
                 <Input
+                  id="editoraSearch"
+                  label="Editora"
                   name="editora"
                   color="secondary"
                   onChange={(event) =>
                     onChangeAdvancedSearch(event, setAdvancedSearchState)
                   }
                   type="text"
-                  placeholder="Digite a editora aqui!"
+                  placeholder="Editora da Obra"
                   reference={ref}
                 />
               ) : (
                 <Input
+                  id="tutorSearch"
+                  label="Tutor"
                   name="tutor"
                   color="secondary"
                   onChange={(event) =>
