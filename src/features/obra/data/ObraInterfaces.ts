@@ -1,4 +1,4 @@
-import type { Estante } from '../../estantes/EstanteInterfaces'
+import type { Estante } from '../../estantes/data/EstanteInterfaces'
 
 export type Monografia = 'monografia' | 'Monografia'
 
@@ -6,7 +6,7 @@ export type Livro = 'livro' | 'Livro'
 
 export type ObraType = Monografia | Livro | ''
 
-export interface ObraResponse {
+export interface ObraEntity {
   codigo: number
   autor: string
   titulo: string
@@ -16,16 +16,18 @@ export interface ObraResponse {
   nomeEstante: string
   localizacaoDesignacao: string
   tipoObra: string
-  tuto?: string
+  tutor?: string
   editora?: string
 }
 
 export interface Obra {
   [key: string]: string | number | undefined
+  codigo?: number
   type: ObraType
   autor: string
   titulo: string
-  quantidadeInicial: number
+  ano: number | string
+  quantidadeInicial: number | string
   quantidadeAtual?: number
   tutor?: string
   editora?: string
@@ -39,7 +41,7 @@ export interface ObraRequest {
 }
 
 export type SingleObra = {
-  obra: ObraResponse
+  obra: ObraEntity
   meta: unknown
   arg: unknown
 }
@@ -48,12 +50,12 @@ export interface FormErrorState {
   error: boolean
   message: string
   errors?: {
-    titulo: ''
-    autor: ''
-    ano: ''
-    quantidadeInicial: ''
-    editora?: ''
-    tutor?: ''
+    titulo: string
+    autor: string
+    ano: string
+    quantidadeInicial: string
+    editora?: string
+    tutor?: string
   }
 }
 
