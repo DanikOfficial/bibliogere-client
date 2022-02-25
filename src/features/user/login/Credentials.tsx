@@ -1,4 +1,4 @@
-import React, { useState, FC, useMemo } from 'react'
+import React, { useState, FC, useEffect } from 'react'
 import { useAppDispatch } from '../../../app/hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useLoginMutation } from '../../../app/services/userApi'
@@ -11,6 +11,7 @@ import Input from '../../../components/reusable/Input'
 const Credentials: FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const divRef = useRef<HTMLDivElement>(null)
 
   const initialErrorState: ErrorState = {
     error: false,
@@ -27,10 +28,7 @@ const Credentials: FC = () => {
 
   const [login, { isLoading, isError }] = useLoginMutation()
 
-  const canLogin: boolean = useMemo(
-    () => Object.values(formState).every(Boolean),
-    [formState]
-  )
+  let canLogin: boolean = Object.values(formState).every(Boolean)
 
   const handleOnChange = ({
     target: { name, value },
@@ -59,24 +57,31 @@ const Credentials: FC = () => {
     }
   }
 
+  useEffect(() => {
+    const element = divRef.current as HTMLDivElement
+    element.click()
+  }, [])
+
   return (
     <>
-      <div className="credentials mb-4">
+      <div className="credentials mb-4" ref={divRef}>
         {isError && (
           <span className="text-danger mb-1">
             <strong>Erro:</strong> {error.message}
           </span>
         )}
 
-        <div className="row">
+        <div className="row mb-2">
           <div className="col-12">
             <Input
+              id="username"
+              label="Utilizador"
               name="username"
               type="text"
               onChange={handleOnChange}
               error={error.errors.username}
               color="prevent"
-              placeholder="Utilizador:"
+              placeholder="Nome do utilizador"
             />
           </div>
         </div>
@@ -84,11 +89,13 @@ const Credentials: FC = () => {
         <div className="row">
           <div className="col-12">
             <Input
+              id="password"
+              label="Palavra-passe"
               name="password"
               type="password"
               onChange={handleOnChange}
               color="prevent"
-              placeholder="Palavra-passe:"
+              placeholder="Palavra-passe do utilizador"
             />
           </div>
         </div>
@@ -105,7 +112,7 @@ const Credentials: FC = () => {
               d-flex
               align-items-center
               me-3
-              mb-2
+              mb-2              
               px-5
             "
             onClick={handleLogin}
