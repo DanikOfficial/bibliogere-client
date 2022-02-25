@@ -1,37 +1,57 @@
 import React from 'react'
+import Select, { ActionMeta, SingleValue, StylesConfig } from 'react-select'
+import type { Option } from '../../app/interfaces/Option'
 
 interface Props {
+  id: string
   name?: string
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
+  label: string
+  onChange: (
+    newValue: SingleValue<Option>,
+    actionMeta: ActionMeta<Option>
+  ) => void
   color: string
-  placeholder?: string
+  value: { value: string | number; label: string | number }
+  options: Option[]
 }
+//HTMLElement | JSX.Element[] | JSX.Element
 
 let ComboBox: React.FC<Props> = ({
   color,
   name,
-  children,
+  value,
+  id,
+  label,
   onChange,
-  placeholder,
-}) => (
-  <select
-    name={name}
-    className={`form-select
-    placeholder-${color}
-    border-end-0
-    border-top-0
-    border-start-0
-    border-2
-    border-${color}
-    text-${color}
-    shadow-none
-    `}
-    onChange={onChange}
-  >
-    {placeholder && <option value={placeholder}>{placeholder}</option>}
-    {children}
-  </select>
-)
+  options,
+}) => {
+  const styles = {
+    control: (oldStyles: any) => ({
+      ...oldStyles,
+      border: '2px solid #1000f2',
+    }),
+  }
+
+  let content: JSX.Element = (
+    <>
+      <label htmlFor={id} className="text-prevent mb-1">
+        {label}
+      </label>
+      <Select
+        id={id}
+        name={name}
+        value={value}
+        options={options}
+        styles={styles}
+        onChange={(value: SingleValue<Option>, action: ActionMeta<Option>) =>
+          onChange(value, action)
+        }
+      />
+    </>
+  )
+
+  return <>{content}</>
+}
 
 ComboBox = React.memo(ComboBox)
 

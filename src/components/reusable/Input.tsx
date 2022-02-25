@@ -1,6 +1,7 @@
 import React from 'react'
 
 interface Props {
+  id: string
   name: string
   type: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
@@ -8,9 +9,11 @@ interface Props {
   error?: string | null
   color: string
   reference?: React.RefObject<HTMLInputElement>
+  label: string
 }
 
 let Input: React.FC<Props> = ({
+  id,
   name,
   type,
   onChange,
@@ -18,37 +21,29 @@ let Input: React.FC<Props> = ({
   error,
   color,
   reference,
+  label,
 }) => {
-  let content: JSX.Element = <></>
-
-  content = (
-    <input
-      type={type}
-      className={`form-control
-              placeholder-${color}
-              border-end-0
-              border-top-0
-              border-start-0
-              border-2
-              border-${color}
-              text-${color}
-              shadow-none
-              `}
-      onChange={onChange}
-      name={name}
-      placeholder={placeholder}
-      ref={reference}
-    />
-  )
-
-  return (
+  let content: JSX.Element = (
     <>
-      <span className={`text-danger ${error ? 'd-block' : 'd-none'}`}>
-        {error}
-      </span>
-      {content}
+      <label htmlFor={id} className="text-prevent mb-1">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        ref={reference}
+        onChange={onChange}
+        className={`form-control shadow-none rounded-3 border-2 border-${
+          error ? 'danger' : `${color}`
+        }`}
+      />
+      <div className="form-text text-danger">{error}</div>
     </>
   )
+
+  return <>{content}</>
 }
 
 Input = React.memo(Input)

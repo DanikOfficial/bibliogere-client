@@ -1,14 +1,16 @@
 import React from 'react'
 
 interface Props {
+  id: string
   name: string
+  label: string
   type: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  placeholder: string
-  error?: string | null
+  placeholder?: string
+  error?: string | undefined | null
   color: string
   reference?: React.RefObject<HTMLInputElement>
-  value?: string | number
+  value: string | number
 }
 
 let ControlledInput: React.FC<Props> = ({
@@ -20,10 +22,38 @@ let ControlledInput: React.FC<Props> = ({
   error,
   color,
   reference,
+  label,
+  id,
 }) => {
-  return (
+  let content: JSX.Element = (
     <>
-      <span className={`text-danger ${error ? 'd-block' : 'd-none'}`}>
+      <label htmlFor={id} className="text-prevent mb-1">
+        {label}
+      </label>
+      <input
+        id={id}
+        value={value}
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        ref={reference}
+        onChange={onChange}
+        className={`form-control shadow-none rounded-3 border-2 border-${
+          error ? 'danger' : `${color}`
+        }`}
+      />
+      <div className="form-text text-danger">{error}</div>
+    </>
+  )
+
+  return <>{content}</>
+}
+
+ControlledInput = React.memo(ControlledInput)
+
+export default ControlledInput
+
+/* <span className={`text-danger ${error ? 'd-block' : 'd-none'}`}>
         {error}
       </span>
       <input
@@ -38,16 +68,10 @@ let ControlledInput: React.FC<Props> = ({
                 border-${color}
                 text-${color}
                 shadow-none
+                ${error ? 'is-invalid' : ''}
                 `}
         onChange={onChange}
         name={name}
         placeholder={placeholder}
         ref={reference}
-      />
-    </>
-  )
-}
-
-ControlledInput = React.memo(ControlledInput)
-
-export default ControlledInput
+      /> */
