@@ -1,4 +1,4 @@
-import React, { useState, FC, useEffect } from 'react'
+import React, { useState, FC } from 'react'
 import { useAppDispatch } from '../../../app/hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useLoginMutation } from '../../../app/services/userApi'
@@ -11,7 +11,6 @@ import Input from '../../../components/reusable/Input'
 const Credentials: FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const divRef = useRef<HTMLDivElement>(null)
 
   const initialErrorState: ErrorState = {
     error: false,
@@ -57,14 +56,9 @@ const Credentials: FC = () => {
     }
   }
 
-  useEffect(() => {
-    const element = divRef.current as HTMLDivElement
-    element.click()
-  }, [])
-
   return (
     <>
-      <div className="credentials mb-4" ref={divRef}>
+      <div className="credentials mb-4">
         {isError && (
           <span className="text-danger mb-1">
             <strong>Erro:</strong> {error.message}
