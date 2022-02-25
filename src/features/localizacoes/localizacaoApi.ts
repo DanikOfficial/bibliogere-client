@@ -3,7 +3,9 @@ import {
   createSelector,
   EntityState,
 } from '@reduxjs/toolkit'
+
 import axios from 'axios'
+
 import { RootState } from '../../app/store'
 
 import { api } from '../api/apiSlice'
