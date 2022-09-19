@@ -1,4 +1,3 @@
-import { type } from 'os'
 import { api } from '../../api/apiSlice'
 import { Estante } from '../../estantes/data/EstanteInterfaces'
 import { ObraEntity, ObraRequest, SingleObra } from './ObraInterfaces'
@@ -6,13 +5,13 @@ import { ObraEntity, ObraRequest, SingleObra } from './ObraInterfaces'
 const obraApi = api.injectEndpoints({
   endpoints: (build) => ({
     // refactor this <ObraResponse, ObraRequest>
-    addObra: build.mutation({
+    addObra: build.mutation<ObraEntity, ObraRequest>({
       query: ({ codigoLocalizacao, codigoEstante, obra }) => ({
         url: `/admin/obras/estante/${codigoEstante}/localizacao/${codigoLocalizacao}`,
         method: 'POST',
         body: obra,
       }),
-      transformResponse: (responseData) => {
+      transformResponse: (responseData: ObraEntity) => {
         console.log(responseData)
 
         return responseData

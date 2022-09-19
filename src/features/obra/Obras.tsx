@@ -1,7 +1,7 @@
 import SectionName from '../../components/dashboard/SectionName'
 import NovaObra from './NovaObra/NovaObra'
+import ObraList from './ObraList'
 import SearchSection from './SearchSection/SearchSection'
-// import ObrasList from './ObrasList'
 
 const Obras: React.FC = () => (
   <>
@@ -9,6 +9,7 @@ const Obras: React.FC = () => (
     <NovaObra />
     <SearchSection />
     <hr />
+    <ObraList />
   </>
 )
 
