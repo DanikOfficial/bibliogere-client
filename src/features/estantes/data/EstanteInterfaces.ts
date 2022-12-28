@@ -1,4 +1,4 @@
-export interface Estante {
+export interface EstanteResponse {
   codigo: number
   nome: string
   tipoEstante: string

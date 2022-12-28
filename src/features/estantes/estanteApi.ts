@@ -8,6 +8,9 @@ import {
 import { api } from '../api/apiSlice'
 import { RootState } from '../../app/store'
 import type { Estante } from './EstanteInterfaces'
+import { estanteAdded } from './estanteSlice'
+import { EstanteRequest } from './data/EstanteInterfaces'
+
 
 const estantesAdapter: EntityAdapter<Estante> = createEntityAdapter<Estante>({
   selectId: (response) => response.codigo,
@@ -24,6 +27,19 @@ const estanteApi = api.injectEndpoints({
 
         return { data: estantesAdapter.setAll(initialState, data) }
       },
+    }),
+    createEstante: build.mutation<Estante, EstanteRequest>({
+      query: (estante: EstanteRequest) => ({
+        url: '/api/v1/estantes',
+        method: 'POST',
+        body: estante,
+      }),
+      onQueryStarted: async (estante, {dispatch, queryFulfilled}) => {
+        const response = await queryFulfilled
+        if (response.data) {
+          dispatch(estanteAdded(response.data))
+        }
+      }
     }),
   }),
 })

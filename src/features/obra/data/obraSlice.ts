@@ -29,7 +29,7 @@ const obraSlice = createSlice({
       console.warn(obra)
       obrasAdapter.addOne(state, obra)
     },
-    addedObras: (state, { payload }: PayloadAction<ObraEntity[]>) => {},
+    addedObras: (state, { payload }: PayloadAction<ObraEntity[]>) => { },
   },
 })
 

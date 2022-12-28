@@ -1,4 +1,4 @@
-import type { Estante } from '../../estantes/data/EstanteInterfaces'
+import type { EstanteResponse } from '../../estantes/data/EstanteInterfaces'
 
 export type Monografia = 'monografia' | 'Monografia'
 
@@ -12,7 +12,7 @@ export interface ObraEntity {
   titulo: string
   ano: number
   quantidadeAtual: number
-  estante: Estante
+  estante: EstanteResponse
   nomeEstante: string
   localizacaoDesignacao: string
   tipoObra: string

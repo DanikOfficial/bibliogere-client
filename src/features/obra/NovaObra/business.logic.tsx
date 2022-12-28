@@ -1,6 +1,6 @@
 import React, { SetStateAction } from 'react'
 import { Modal } from 'bootstrap'
-import { Estante } from '../../estantes/data/EstanteInterfaces'
+import { EstanteResponse } from '../../estantes/data/EstanteInterfaces'
 import { Localizacao } from '../../localizacoes/localizacaoApi'
 import type { ErrorResponse } from '../../../app/interfaces/ErrorResponse'
 import { FormErrorState, ObraRequest, ObraEntity } from '../data/ObraInterfaces'
@@ -25,7 +25,7 @@ export const hideModal = (ref: React.RefObject<HTMLDivElement>) => {
   bsModal?.hide()
 }
 
-export const renderEstantes = (estantes: Estante[]) => {
+export const renderEstantes = (estantes: EstanteResponse[]) => {
   const renderedEstantes = estantes.map(
     (estante) => ({ value: estante.codigo, label: estante.nome } as Option)
   )

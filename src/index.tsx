@@ -8,7 +8,7 @@ import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
 
 import localizacaoApi from './features/localizacoes/localizacaoApi'
-import estanteApi from './features/estantes/data/estanteApi'
+// import estanteApi from './features/estantes/data/estanteApi'
 
 // Initialize
 
@@ -16,7 +16,7 @@ import estanteApi from './features/estantes/data/estanteApi'
 store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
 
 // Estantes
-store.dispatch(estanteApi.endpoints.getEstantes.initiate())
+// store.dispatch(estanteApi.endpoints.getEstantes.initiate())
 
 ReactDOM.render(
   <React.StrictMode>

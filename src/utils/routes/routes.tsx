@@ -22,6 +22,10 @@ const routes: RouteObject[] = [
             path: 'obras',
             element: <Obras />,
           },
+          {
+            path: 'estantes',
+            element: <Estante />
+          }
         ],
       },
     ],
