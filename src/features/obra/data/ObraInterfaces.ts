@@ -1,10 +1,11 @@
+import {
+  Monografia,
+  Livro,
+} from '../../../components/reusable/data/CommonInterfaces'
 import type { EstanteResponse } from '../../estantes/data/EstanteInterfaces'
+import type Option from '../../../app/interfaces/Option'
 
-export type Monografia = 'monografia' | 'Monografia'
-
-export type Livro = 'livro' | 'Livro'
-
-export type ObraType = Monografia | Livro | ''
+export type ObraType = Monografia | Livro | string
 
 export interface ObraEntity {
   codigo: number
@@ -20,6 +21,8 @@ export interface ObraEntity {
   editora?: string
 }
 
+export interface ObraResponse extends ObraEntity {}
+
 export interface Obra {
   [key: string]: string | number | undefined
   codigo?: number
@@ -31,6 +34,20 @@ export interface Obra {
   quantidadeAtual?: number
   tutor?: string
   editora?: string
+}
+
+export interface ObraForm {
+  [key: string]: string | number | undefined | Option
+  type: Option
+  autor: string
+  titulo: string
+  ano: number | string
+  quantidadeInicial: number | string
+  quantidadeAtual?: number
+  tutor?: string
+  editora?: string
+  localizacao: Option
+  estante: Option
 }
 
 export interface ObraRequest {
@@ -46,7 +63,7 @@ export type SingleObra = {
   arg: unknown
 }
 
-export interface FormErrorState {
+export interface ObraFormErrorState {
   error: boolean
   message: string
   errors?: {

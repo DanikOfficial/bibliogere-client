@@ -3,7 +3,7 @@ import React from 'react'
 interface Props {
   id: string
   name: string
-  label: string
+  label?: string
   type: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
@@ -27,9 +27,11 @@ let ControlledInput: React.FC<Props> = ({
 }) => {
   let content: JSX.Element = (
     <>
-      <label htmlFor={id} className="text-prevent mb-1">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="text-prevent mb-1">
+          {label}
+        </label>
+      )}
       <input
         id={id}
         value={value}
@@ -49,29 +51,4 @@ let ControlledInput: React.FC<Props> = ({
   return <>{content}</>
 }
 
-ControlledInput = React.memo(ControlledInput)
-
 export default ControlledInput
-
-/* <span className={`text-danger ${error ? 'd-block' : 'd-none'}`}>
-        {error}
-      </span>
-      <input
-        value={value}
-        type={type}
-        className={`form-control
-                placeholder-${color}
-                border-end-0
-                border-top-0
-                border-start-0
-                border-2
-                border-${color}
-                text-${color}
-                shadow-none
-                ${error ? 'is-invalid' : ''}
-                `}
-        onChange={onChange}
-        name={name}
-        placeholder={placeholder}
-        ref={reference}
-      /> */

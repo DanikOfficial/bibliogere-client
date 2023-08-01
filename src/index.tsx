@@ -1,14 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
 import { store } from './app/store'
 import { Provider } from 'react-redux'
 import './assets/main.min.css'
 import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
-
 import localizacaoApi from './features/localizacoes/localizacaoApi'
-// import estanteApi from './features/estantes/data/estanteApi'
+import App from './App'
+import estanteApi from './features/estantes/data/estanteApi'
 
 // Initialize
 
@@ -16,7 +15,7 @@ import localizacaoApi from './features/localizacoes/localizacaoApi'
 store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
 
 // Estantes
-// store.dispatch(estanteApi.endpoints.getEstantes.initiate())
+store.dispatch(estanteApi.endpoints.getEstantes.initiate())
 
 ReactDOM.render(
   <React.StrictMode>
