@@ -4,7 +4,7 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Obra, ObraEntity } from './ObraInterfaces'
+import type { ObraEntity } from './ObraInterfaces'
 
 const comparer = (firstObra: ObraEntity, secondObra: ObraEntity) => {
   if (firstObra.codigo < secondObra.codigo) return -1
@@ -29,7 +29,7 @@ const obraSlice = createSlice({
       console.warn(obra)
       obrasAdapter.addOne(state, obra)
     },
-    addedObras: (state, { payload }: PayloadAction<ObraEntity[]>) => { },
+    addedObras: (state, { payload }: PayloadAction<ObraEntity[]>) => {},
   },
 })
 

@@ -1,105 +1,86 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { selectEstantesByTipoObra } from '../../estantes/data/estanteApi'
 import { selectAllLocalizacoes } from '../../localizacoes/localizacaoApi'
 import { useAddObraMutation } from '../data/obraApi'
 import { obraAdded } from '../data/obraSlice'
-import { ObraRequest, FormErrorState, Obra } from '../data/ObraInterfaces'
+import { ObraFormErrorState, ObraForm } from '../data/ObraInterfaces'
 import {
   initialErrorState,
-  initialObraRequestState,
-  initialObraState,
+  initialObraFormState,
   initialTipoObraOptionsState,
 } from './NovaObraModalState'
 import {
   addNewObraLogic,
   hideModal,
-  renderEstantes,
   renderLocalizacoes,
 } from './business.logic'
-import {
-  onChangeTipoObra,
-  onChangeFormState,
-  onChangeComboBox,
-  resetFormState,
-} from './events.logic'
-
-import Input from '../../../components/reusable/Input'
+import { onChangeTipoObra } from './events.logic'
 import ComboBox from '../../../components/reusable/ComboBox'
 import ControlledInput from '../../../components/reusable/ControlledInput'
-import { Option } from '../../../app/interfaces/Option'
+import {
+  filterEstantesByTipoEstante,
+  selectAllEstantes,
+} from '../../estantes/data/estanteSlice'
+import { renderEstantesOptions } from '../../estantes/EstanteList/business.logic'
+import {
+  onInputChange,
+  onChangeSelect,
+} from '../../../utils/reusable/CommonFormEventsHandler'
+import { EMPTY } from '../../../components/reusable/data/Constants'
 
 interface Props {
   reference: React.RefObject<HTMLDivElement>
 }
 
 const NovaObraModal: React.FC<Props> = ({ reference }) => {
-  const [formState, setFormState] = useState<Obra>(initialObraState)
+  const [formState, setFormState] = useState<ObraForm>(initialObraFormState)
+  const obraType = formState.type.value as string
+
   const [addObra, { isLoading, isError }] = useAddObraMutation()
-  const [formStateRequest, setFormStateRequest] = useState<ObraRequest>(
-    initialObraRequestState
-  )
-  const [error, setError] = useState<FormErrorState>(initialErrorState)
+  const [error, setError] = useState<ObraFormErrorState>(initialErrorState)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const estantes = useAppSelector((state) =>
-    selectEstantesByTipoObra(state, formState.type)
+  const estanteEntities = useAppSelector(selectAllEstantes)
+
+  const estantes = filterEstantesByTipoEstante(
+    estanteEntities,
+    formState.type.value as string
   )
 
   const localizacoes = useAppSelector(selectAllLocalizacoes)
 
-  const estanteOptions = renderEstantes(estantes)
+  const estanteOptions = renderEstantesOptions(estantes)
 
   const localizacaoOptions = renderLocalizacoes(localizacoes)
 
-  const [localizacao, setLocalizacao] = useState<Option>(localizacaoOptions[0])
-  const [defaultEstante, setEstante] = useState<Option>(estanteOptions[0])
-
-  const [tipoObra, setTipoObra] = useState<Option>(
-    initialTipoObraOptionsState[0]
-  )
-
   const dispatch = useAppDispatch()
 
-  const onChangeLocalizacao = onChangeComboBox<ObraRequest, Option>(
-    setFormStateRequest,
-    setLocalizacao
-  )
+  const onChangeLocalizacao = (
+    name: string,
+    value: string | number,
+    label: string = EMPTY
+  ) => onChangeSelect(setFormState, name, value, label)
 
-  const onChangeEstante = onChangeComboBox<ObraRequest, Option>(
-    setFormStateRequest,
-    setEstante
-  )
+  const onChangeEstante = (
+    name: string,
+    value: string | number,
+    label: string = EMPTY
+  ) => onChangeSelect(setFormState, name, value, label)
+  const onChangeTipo = (
+    name: string,
+    value: string | number,
+    label: string = EMPTY
+  ) => onChangeTipoObra(setFormState, inputRef, { value, label }, formState)
 
-  const onChangeTipo = onChangeTipoObra(
-    setFormState,
-    setTipoObra,
-    inputRef,
-    formState
-  )
-
-  const addNewObra = () => {
-    const request: ObraRequest = {
-      ...formStateRequest,
-      obra: { ...formState },
-    }
-
+  const addNewObra = () =>
     addNewObraLogic(
       dispatch,
       clearFormFields,
       obraAdded,
-      request,
+      formState,
       addObra,
       setError
     )
-  }
-
-  const clearFormFields = () => {
-    resetFormState(setFormState, setFormStateRequest, setError)
-    setLocalizacao(localizacaoOptions[0])
-    setEstante(estanteOptions[0])
-    setTipoObra(initialTipoObraOptionsState[0])
-  }
 
   const closeModal = () => {
     hideModal(reference)
@@ -111,17 +92,15 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
     [formState]
   )
 
+  const clearFormFields = () => {}
+
   // Each time the obra type is changed, we add the current property to the state
   useEffect(() => {
     const element = inputRef.current as HTMLInputElement
     if (element) {
       const name = element.name
 
-      // console.log(tipoObra)
-      // console.log(name)
-
       element.value = ''
-      // const type = formState.type.toUpperCase() as ObraType
 
       // This code must be refactored
       setFormState((prev) => ({
@@ -168,7 +147,7 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                     <ComboBox
                       id="tipoObra"
                       label="Tipo de Obra"
-                      value={tipoObra}
+                      value={formState.type}
                       color="secondary"
                       options={initialTipoObraOptionsState}
                       onChange={onChangeTipo}
@@ -193,9 +172,7 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       value={formState.titulo}
                       id="titulo"
                       label="Titulo"
-                      onChange={(event) =>
-                        onChangeFormState(event, setFormState)
-                      }
+                      onChange={(event) => onInputChange(event, setFormState)}
                       placeholder="Titulo da obra"
                       error={error.errors?.titulo}
                       type="text"
@@ -210,9 +187,7 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       id="autor"
                       label="Autor"
                       value={formState.autor}
-                      onChange={(event) =>
-                        onChangeFormState(event, setFormState)
-                      }
+                      onChange={(event) => onInputChange(event, setFormState)}
                       placeholder="Nome dos autor(es) da obra"
                       error={error.errors?.autor}
                       type="text"
@@ -222,33 +197,31 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
 
                 <div className={`row ${formState.type ? 'mb-2' : ''}`}>
                   <div className="col-lg-10">
-                    {formState.type.toLocaleLowerCase() === 'livro' && (
-                      <Input
+                    {obraType.toLowerCase() === 'livro' && (
+                      <ControlledInput
                         id="editora"
                         label="Editora"
+                        value={formState.editora ?? ''}
                         color="secondary"
                         name="editora"
                         type="text"
                         error={error.errors?.editora}
-                        onChange={(event) =>
-                          onChangeFormState(event, setFormState)
-                        }
+                        onChange={(event) => onInputChange(event, setFormState)}
                         reference={inputRef}
                         placeholder="Editora do livro!"
                       />
                     )}
 
-                    {formState.type.toLocaleLowerCase() === 'monografia' && (
-                      <Input
+                    {obraType.toLowerCase() === 'monografia' && (
+                      <ControlledInput
                         id="tutor"
                         label="Tutor"
+                        value={formState.tutor ?? ''}
                         color="secondary"
                         name="tutor"
                         type="text"
                         error={error.errors?.tutor}
-                        onChange={(event) =>
-                          onChangeFormState(event, setFormState)
-                        }
+                        onChange={(event) => onInputChange(event, setFormState)}
                         reference={inputRef}
                         placeholder="Tutor da Monografia!"
                       />
@@ -265,9 +238,7 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       color="secondary"
                       label="Quantidade"
                       id="quantidade"
-                      onChange={(event) =>
-                        onChangeFormState(event, setFormState)
-                      }
+                      onChange={(event) => onInputChange(event, setFormState)}
                       placeholder="Digite a quantidade aqui!"
                     />
                   </div>
@@ -280,9 +251,7 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       color="secondary"
                       label="Ano"
                       id="ano"
-                      onChange={(event) =>
-                        onChangeFormState(event, setFormState)
-                      }
+                      onChange={(event) => onInputChange(event, setFormState)}
                       placeholder="Digite o ano aqui!"
                     />
                   </div>
@@ -293,8 +262,8 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       id="estante"
                       label="Estante"
                       color="secondary"
-                      value={defaultEstante}
-                      name="codigoEstante"
+                      value={formState.estante}
+                      name="estante"
                       options={estanteOptions}
                       onChange={onChangeEstante}
                     />
@@ -306,8 +275,8 @@ const NovaObraModal: React.FC<Props> = ({ reference }) => {
                       id="localizacao"
                       label="Localização"
                       color="secondary"
-                      name="codigoLocalizacao"
-                      value={localizacao}
+                      name="localizacao"
+                      value={formState.localizacao}
                       options={localizacaoOptions}
                       onChange={onChangeLocalizacao}
                     />

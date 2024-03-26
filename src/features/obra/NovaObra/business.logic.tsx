@@ -1,12 +1,16 @@
 import React, { SetStateAction } from 'react'
 import { Modal } from 'bootstrap'
-import { EstanteResponse } from '../../estantes/data/EstanteInterfaces'
 import { Localizacao } from '../../localizacoes/localizacaoApi'
 import type { ErrorResponse } from '../../../app/interfaces/ErrorResponse'
-import { FormErrorState, ObraRequest, ObraEntity } from '../data/ObraInterfaces'
+import {
+  ObraFormErrorState,
+  ObraRequest,
+  ObraEntity,
+  ObraForm,
+} from '../data/ObraInterfaces'
 import { handleErrorResponse } from '../../../utils/reusable/ResponseHandler'
-import { ActionCreatorWithPayload } from '@reduxjs/toolkit'
-import type { Option } from '../../../app/interfaces/Option'
+import { ActionCreatorWithPayload, AnyAction, Dispatch } from '@reduxjs/toolkit'
+import type Option from '../../../app/interfaces/Option'
 
 export const displayModal = (ref: React.RefObject<HTMLDivElement>) => {
   const modalEl = ref.current as HTMLDivElement
@@ -25,21 +29,8 @@ export const hideModal = (ref: React.RefObject<HTMLDivElement>) => {
   bsModal?.hide()
 }
 
-export const renderEstantes = (estantes: EstanteResponse[]) => {
-  const renderedEstantes = estantes.map(
-    (estante) => ({ value: estante.codigo, label: estante.nome } as Option)
-  )
-
-  renderedEstantes.unshift({
-    value: '',
-    label: 'Estante onde a obra ficará!',
-  })
-
-  return renderedEstantes
-}
-
-export const renderLocalizacoes = (localizacoes: Localizacao[]) => {
-  const renderedLocalizacoes = localizacoes.map(
+export const renderLocalizacoes = (localizacoes: Localizacao[]) =>
+  localizacoes.map(
     (localizacao) =>
       ({
         value: localizacao.codigo,
@@ -47,30 +38,36 @@ export const renderLocalizacoes = (localizacoes: Localizacao[]) => {
       } as Option)
   )
 
-  renderedLocalizacoes.unshift({
-    value: '',
-    label: 'Localização onde a obra ficará!',
-  })
-
-  return renderedLocalizacoes
-}
-
 export const addNewObraLogic = async (
-  dispatch: any,
+  dispatch: Dispatch<AnyAction>,
   clearFormFields: () => void,
   addedObra: ActionCreatorWithPayload<ObraEntity, string>,
-  request: ObraRequest,
+  obraForm: ObraForm,
   addObra: any,
-  setError: React.Dispatch<SetStateAction<FormErrorState>>
+  setUIError: React.Dispatch<SetStateAction<ObraFormErrorState>>
 ) => {
-  try {
-    const newObra: ObraEntity = await addObra(request).unwrap()
-    dispatch(addedObra(newObra))
-    console.info(newObra)
+  const obraType = obraForm.type.value as string
 
-    // clearFormFields()
+  const novaObraRequest: ObraRequest = {
+    codigoEstante: obraForm.estante.value as number,
+    codigoLocalizacao: obraForm.localizacao.value as number,
+    obra: {
+      ano: obraForm.ano,
+      autor: obraForm.autor,
+      titulo: obraForm.titulo,
+      type: obraType,
+      quantidadeInicial: obraForm.quantidadeInicial,
+      ...(obraForm.tutor && { tutor: obraForm.tutor }),
+      ...(obraForm.editora && { editora: obraForm.editora }),
+    },
+  }
+
+  try {
+    const newObra: ObraEntity = await addObra(novaObraRequest).unwrap()
+    dispatch(addedObra(newObra))
+    // TODO: Handle the clearing of state, clearing the Obra fields
   } catch (error) {
     console.log(error)
-    handleErrorResponse(error as ErrorResponse, setError)
+    handleErrorResponse(error as ErrorResponse<ObraFormErrorState>, setUIError)
   }
 }

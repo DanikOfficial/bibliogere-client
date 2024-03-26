@@ -1,4 +1,4 @@
-import { Option } from '../../../app/interfaces/Option'
+import type Option from '../../../app/interfaces/Option'
 import { FormSearchState } from '../data/ObraInterfaces'
 
 export const InitialAdvancedSearchState: FormSearchState = {

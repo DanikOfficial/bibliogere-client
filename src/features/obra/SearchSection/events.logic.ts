@@ -1,11 +1,10 @@
 import { Dispatch, SetStateAction, RefObject, ChangeEvent } from 'react'
 import { SingleValue, ActionMeta } from 'react-select'
-import { Option } from '../../../app/interfaces/Option'
+import type Option from '../../../app/interfaces/Option'
 import { FormSearchState, ObraType } from '../data/ObraInterfaces'
 import { InitialAdvancedSearchState } from './SearchSectionState'
 
 /**
- *
  * @param event destructuring of the event object to get the value for the state
  * @param setTitulo function returned from useState call so we can mutate the titulo
  * @returns

@@ -2,7 +2,8 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import { api } from '../features/api/apiSlice'
 import userReducer from '../features/user/userSlice'
 import obraReducer from '../features/obra/data/obraSlice'
-import estanteReducer from '../features/estantes/estanteSlice'
+import estanteReducer from '../features/estantes/data/estanteSlice'
+import tipoEstanteReducer from '../features/tipoEstante/tipoEstanteSlice'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     user: userReducer,
     obra: obraReducer,
     estante: estanteReducer,
+    tipoEstante: tipoEstanteReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),

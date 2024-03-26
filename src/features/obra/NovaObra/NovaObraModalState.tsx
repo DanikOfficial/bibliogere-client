@@ -1,20 +1,21 @@
-import { ObraRequest, FormErrorState, Obra } from '../data/ObraInterfaces'
+import { EMPTY_OPTION } from '../../../components/reusable/data/Constants'
+import {
+  ObraRequest,
+  ObraFormErrorState,
+  ObraForm,
+} from '../data/ObraInterfaces'
 
-export const initialObraState: Obra = {
-  type: '',
+export const initialObraFormState: ObraForm = {
+  type: EMPTY_OPTION,
   autor: '',
   ano: '',
   quantidadeInicial: '',
   titulo: '',
+  estante: { label: '', value: '' },
+  localizacao: { label: '', value: '' },
 }
 
-export const initialObraRequestState: ObraRequest = {
-  codigoEstante: -1,
-  codigoLocalizacao: -1,
-  obra: initialObraState,
-}
-
-export const initialErrorState: FormErrorState = {
+export const initialErrorState: ObraFormErrorState = {
   error: false,
   message: '',
   errors: {
@@ -28,10 +29,6 @@ export const initialErrorState: FormErrorState = {
 }
 
 export const initialTipoObraOptionsState = [
-  {
-    value: '',
-    label: 'Tipo de obra por registar!',
-  },
   { value: 'livro', label: 'Livro' },
   { value: 'monografia', label: 'Monografia' },
 ]

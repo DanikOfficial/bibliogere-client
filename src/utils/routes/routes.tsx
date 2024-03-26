@@ -4,6 +4,7 @@ import ProtectedRoutes from '../ProtectedRoutes'
 import type { RouteObject } from 'react-router-dom'
 import Hero from '../../components/hero/Hero'
 import Obras from '../../features/obra/Obras'
+import Estantes from '../../features/estantes/Estantes'
 
 const routes: RouteObject[] = [
   {
@@ -24,8 +25,8 @@ const routes: RouteObject[] = [
           },
           {
             path: 'estantes',
-            element: <Estante />
-          }
+            element: <Estantes />,
+          },
         ],
       },
     ],

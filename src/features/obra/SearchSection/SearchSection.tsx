@@ -3,7 +3,7 @@ import ComboBox from '../../../components/reusable/ComboBox'
 import Input from '../../../components/reusable/Input'
 import ControlledInput from '../../../components/reusable/ControlledInput'
 import type { ObraType, FormSearchState } from '../data/ObraInterfaces'
-import type { Option } from '../../../app/interfaces/Option'
+import Option from '../../../app/interfaces/Option'
 import {
   InitialAdvancedSearchState,
   tipoObraOptionsInitialState,
@@ -14,12 +14,13 @@ import {
   onToggleAdvancedSearch,
   onChangeTipoObraComboBox,
 } from './events.logic'
+import { EMPTY, livro } from '../../../components/reusable/data/Constants'
 
 const SearchSection: React.FC = () => {
   const ref = useRef<HTMLInputElement>(null)
-  const [tipoObra, setTipoObra] = useState<ObraType>('livro')
+  const [tipoObra, setTipoObra] = useState<ObraType>(livro)
   const [isAdvanced, setIsAdvanced] = useState<boolean>(false)
-  const [titulo, setTitulo] = useState<string>('')
+  const [titulo, setTitulo] = useState<string>(EMPTY)
   const [advancedSearchState, setAdvancedSearchState] =
     useState<FormSearchState>(InitialAdvancedSearchState)
 
@@ -44,7 +45,7 @@ const SearchSection: React.FC = () => {
 
     console.log('The name: ' + name)
 
-    element.value = ''
+    element.value = EMPTY
 
     setAdvancedSearchState((prev) => ({ ...prev, [name]: '' }))
   }, [tipoObra])
@@ -55,6 +56,7 @@ const SearchSection: React.FC = () => {
         id="search-fields"
         className="rounded bg-white py-2 px-3 mb-2 col col-xl-11 border-2"
       >
+        <h5 className="text-center text-prevent my-2">Pesquisar Obra</h5>
         <div className="row mb-4">
           <div className="col col-xl-7 mb-2 mb-xl-0">
             <Input
@@ -70,6 +72,10 @@ const SearchSection: React.FC = () => {
             />
           </div>
           <div className="col-xl-3 mb-3 mb-xl-0">
+            {/*
+            
+            FIXME: fix this
+
             <ComboBox
               id="tipoObra"
               label="Tipo de Obra"
@@ -77,7 +83,7 @@ const SearchSection: React.FC = () => {
               color="secondary"
               onChange={onChangeTipoObraSelect}
               options={tipoObraOptions}
-            />
+            /> */}
           </div>
           <div className="col-sm-5 col-md-4 col-lg-2 col-xl-2 mt-lg-4">
             <button

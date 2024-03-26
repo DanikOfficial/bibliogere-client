@@ -1,4 +1,4 @@
-export interface ErrorResponse {
+export interface ErrorResponse<T> {
   status: number
-  data: any
+  data: T
 }

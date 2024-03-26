@@ -5,19 +5,17 @@ import Select, {
   SingleValue,
   StylesConfig,
 } from 'react-select'
-import type { Option } from '../../app/interfaces/Option'
+import type Option from '../../app/interfaces/Option'
 
 interface Props {
   id: string
   name?: string
-  label: string
-  onChange: (
-    newValue: SingleValue<Option>,
-    actionMeta: ActionMeta<Option>
-  ) => void
+  label?: string
+  onChange: (name: string, value: string | number, label: string) => void
   color: string
-  value: { value: string | number; label: string | number }
+  value?: { value: string | number; label: string | number }
   options: Option[]
+  error?: string
 }
 //HTMLElement | JSX.Element[] | JSX.Element
 
@@ -29,18 +27,9 @@ let ComboBox: React.FC<Props> = ({
   label,
   onChange,
   options,
+  error,
 }) => {
-  const styles: StylesConfig<
-    {
-      value: string | number
-      label: string | number
-    },
-    false,
-    GroupBase<{
-      value: string | number
-      label: string | number
-    }>
-  > = {
+  const styles: StylesConfig<Option, false, GroupBase<Option>> = {
     control: (oldStyles: any) => ({
       ...oldStyles,
       border: '2px solid #1000f2',
@@ -50,22 +39,29 @@ let ComboBox: React.FC<Props> = ({
 
   let content: JSX.Element = (
     <>
-      <label htmlFor={id} className="text-prevent mb-1">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="text-prevent mb-1">
+          {label}
+        </label>
+      )}
       <Select
         id={id}
         name={name}
         value={value}
         options={options}
         styles={styles}
-        onChange={(value: SingleValue<Option>, action: ActionMeta<Option>) =>
-          onChange(value, action)
-        }
+        onChange={(
+          singleValue: SingleValue<Option>,
+          action: ActionMeta<Option>
+        ) => {
+          const { value, label } = singleValue as Option
+          const name = action.name as string
+          onChange(name, value, label as string)
+        }}
       />
+      <div className="form-text text-danger">{error}</div>
     </>
   )
-
   return <>{content}</>
 }
 
