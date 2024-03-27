@@ -72,9 +72,9 @@ const NovaEstante: React.FC = () => {
     useState<EstanteFormErrorResponse>(initialErrorState)
   const [isError, setIsError] = useState<Boolean>(false)
 
-  const toggleCreateNewEstante = () => {
-    setIsCreating((prev) => !prev)
-  }
+  const enableCreateNewEstante = () => setIsCreating(true)
+
+  const disableCreateNewEstante = () => setIsCreating(false)
 
   const onChangeTipoEstanteSelect = (
     name: string,
@@ -131,13 +131,14 @@ const NovaEstante: React.FC = () => {
     if (isUpdating) {
       dispatch(estanteUpdateCanceled())
     }
-    setFormState(defaultEstanteFormState)
-    setError(defaultEstanteErrorFormState)
-    toggleCreateNewEstante()
+    clearFields()
   }
 
   const clearFields = () => {
     setFormState(defaultEstanteFormState)
+    setError(defaultEstanteErrorFormState)
+    setIsError(false)
+    disableCreateNewEstante()
   }
 
   const setCurrentEstante = useCallback(() => {
@@ -191,6 +192,10 @@ const NovaEstante: React.FC = () => {
     isUpdateEstanteRequestSuccess,
   ])
 
+  useEffect(() => isError && toast.dismiss(), [isError])
+
+  useEffect(() => isUpdating && disableCreateNewEstante(), [isUpdating])
+
   return (
     <>
       <div id="nova-estante-wrapper" className="mb-3">
@@ -204,7 +209,7 @@ const NovaEstante: React.FC = () => {
                 align-items-center
                 shadow-none
               "
-          onClick={toggleCreateNewEstante}
+          onClick={enableCreateNewEstante}
         >
           <span>Nova Estante</span>
           <i className="ms-2 bi bi-plus-square fs-5"></i>

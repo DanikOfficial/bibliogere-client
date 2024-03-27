@@ -1,9 +1,5 @@
-import toast from 'react-hot-toast'
 import type Option from '../../app/interfaces/Option'
-import {
-  DeleteOptions,
-  ToastOptions,
-} from '../../components/reusable/data/CommonInterfaces'
+import { DeleteOptions } from '../../components/reusable/data/CommonInterfaces'
 import Swal from 'sweetalert2'
 
 export const findSelectedOption =

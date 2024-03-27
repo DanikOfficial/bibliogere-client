@@ -1,5 +1,4 @@
-import { Modal } from 'bootstrap'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import NovaObraModal from './NovaObraModal'
 import { displayModal } from './business.logic'
 
