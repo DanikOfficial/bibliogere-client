@@ -16,7 +16,7 @@ import { ErrorResponse } from '../../../app/interfaces/ErrorResponse'
  * @param estante  will be parsed to Request object
  * @param createEstante sends request to the server, this cannot be used as type due to redux toolkit restrictions
  * @param setUIError displays error in the UI
- * @param clearFields
+ * @param onCreateEstanteSuccess callback that will be triggered when successfully created estante
  */
 export const sendCreateEstanteRequest = async (
   estante: EstanteEntity,
