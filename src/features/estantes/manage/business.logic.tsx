@@ -29,7 +29,7 @@ export const sendCreateEstanteRequest = async (
       nome: estante.nome,
       tipoEstante: estante.tipoEstante,
     }
-    await createEstante(createEstanteRequest).unwrap()
+    await createEstante(createEstanteRequest)
     onCreateEstanteSuccess(true)
   } catch (error: unknown) {
     handleErrorResponse(
@@ -54,7 +54,7 @@ export const sendUpdateEstanteRequest = async (
         tipoEstante: estante.tipoEstante,
       },
     }
-    await updateEstante(updateEstanteRequest).unwrap()
+    await updateEstante(updateEstanteRequest)
     onUpdateEstanteSuccess(true)
     dispatch(estanteUpdateCanceled())
   } catch (error: unknown) {
@@ -71,7 +71,7 @@ export const sendDeleteEstanteRequest = async (
   deleteEstante: any
 ) => {
   try {
-    await deleteEstante(codigoEstante).unwrap()
+    await deleteEstante(codigoEstante)
   } catch (error) {
     handleErrorResponse(
       error as ErrorResponse<EstanteFormErrorResponse>,

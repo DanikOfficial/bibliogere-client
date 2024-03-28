@@ -3,6 +3,7 @@ import {
   PayloadAction,
   EntityAdapter,
   createEntityAdapter,
+  createSelector,
 } from '@reduxjs/toolkit'
 import Logger from '../../../utils/reusable/Logger'
 import type { CrudInitialState } from '../../../components/reusable/data/CommonInterfaces'
@@ -88,10 +89,10 @@ const estantesSlice = createSlice({
     },
     estantesAdded: (
       state,
-      { payload: estante }: PayloadAction<EstanteEntity[]>
+      { payload: estantes }: PayloadAction<EstanteEntity[]>
     ) => {
       logger.log(`Adding fetched estantes to the Adapter.`)
-      estantesAdapter.setAll(state.all, estante)
+      estantesAdapter.setAll(state.all, estantes)
     },
     estanteSelected: (
       state,
@@ -131,12 +132,14 @@ export const isUpdatingEstante = (state: RootState) => state.estante.isUpdating
 export const isFetchingEstantes = (state: RootState) =>
   state.estante.isFetchingEntities
 
-export const filterEstantesByTipoEstante = (
-  estantes: EstanteEntity[],
-  tipoEstante: string
-): EstanteEntity[] =>
-  estantes.filter(
-    (estante) => estante.tipoEstante.toUpperCase === tipoEstante.toUpperCase
-  )
+export const selectEstantesByTipoEstante = createSelector(
+  selectAllEstantes,
+  (_: RootState, tipoEstante: string) => tipoEstante,
+  (estantes, tipoEstante) =>
+    estantes.filter(
+      (estante) =>
+        estante.tipoEstante.toUpperCase() === tipoEstante.toUpperCase()
+    )
+)
 
 export default estantesSlice.reducer
