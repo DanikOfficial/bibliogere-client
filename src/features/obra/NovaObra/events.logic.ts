@@ -1,11 +1,12 @@
 import React, { SetStateAction, Dispatch, RefObject } from 'react'
 import type Option from '../../../app/interfaces/Option'
 import {
-  ObraFormErrorState,
+  ObraFormErrorResponse,
   ObraRequest,
   ObraForm,
+  defaultObraFormState,
+  defaultObraFormErrorResponse,
 } from '../data/ObraInterfaces'
-import { initialErrorState, initialObraFormState } from './NovaObraModalState'
 
 /**
  *
@@ -27,10 +28,10 @@ export const onChangeTipoObra = (
   if (property) {
     const name: string = property.name
 
-    // checks wether there's a property for the old entity, if so, then deletes the property, this code will need refactoring
-    if (name) {
-      delete formState[name]
-    }
+    // Create a new object based on the current form state, omitting the property to be deleted
+    const updatedFormState = { ...formState }
+    delete updatedFormState[name]
+    setFormState(updatedFormState)
   }
 
   setFormState((prev) => ({ ...prev, type: selectedTipo }))
@@ -45,8 +46,8 @@ export const onChangeTipoObra = (
 export const resetFormState = (
   setFormState: React.Dispatch<React.SetStateAction<ObraForm>>,
   setFormStateRequest: React.Dispatch<React.SetStateAction<ObraRequest>>,
-  setError: React.Dispatch<React.SetStateAction<ObraFormErrorState>>
+  setError: React.Dispatch<React.SetStateAction<ObraFormErrorResponse>>
 ) => {
-  setFormState(initialObraFormState)
-  setError(initialErrorState)
+  setFormState(defaultObraFormState)
+  setError(defaultObraFormErrorResponse)
 }

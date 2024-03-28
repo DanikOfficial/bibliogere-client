@@ -1,17 +1,26 @@
-import { useRef } from 'react'
-import NovaObraModal from './NovaObraModal'
-import { displayModal } from './business.logic'
+import { useRef, useState } from 'react'
+import NovaObraModal, { NovaObraModalProps } from './NovaObraModal'
 
 const NovaObra: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null)
+  const [isNovaObraModalDisplayed, setIsNovaObraModalDisplayed] =
+    useState<Boolean>(false)
 
   const showModal = () => {
-    displayModal(ref)
+    setIsNovaObraModalDisplayed(true)
+  }
+
+  const removeModal = () => {
+    setIsNovaObraModalDisplayed(false)
+  }
+
+  const novaObraModalProps: NovaObraModalProps = {
+    hideModal: removeModal,
   }
 
   return (
     <>
-      <NovaObraModal reference={ref} />
+      {isNovaObraModalDisplayed && <NovaObraModal {...novaObraModalProps} />}
       <div id="nova-obra-wrapper" className="mb-3">
         <button
           className="

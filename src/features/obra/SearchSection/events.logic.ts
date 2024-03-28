@@ -66,8 +66,6 @@ export const onChangeTipoObra = (
   const property = ref.current as HTMLInputElement
   const name: string = property.name
 
-  console.log('value: ' + event)
-
   // checks wether there's a property for the old entity, if so, then deletes the property, this code will need refactoring
   if (name) {
     delete advancedSearchState[name]

@@ -42,12 +42,9 @@ const SearchSection: React.FC = () => {
   useEffect(() => {
     const element = ref.current as HTMLInputElement
     const name = element.name
-
-    console.log('The name: ' + name)
-
     element.value = EMPTY
 
-    setAdvancedSearchState((prev) => ({ ...prev, [name]: '' }))
+    setAdvancedSearchState((prev) => ({ ...prev, [name]: EMPTY }))
   }, [tipoObra])
 
   return (

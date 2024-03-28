@@ -23,10 +23,7 @@ export const onChangeSelect = <T>(
   name: string,
   value: string | number,
   label: string | undefined = undefined
-) => {
-  console.log(name, value, label)
-
+) =>
   label
     ? setFormState((prev: T) => ({ ...prev, [name]: { value, label } }))
     : setFormState((prev: T) => ({ ...prev, [name]: value }))
-}

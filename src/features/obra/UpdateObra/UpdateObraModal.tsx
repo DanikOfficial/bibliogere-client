@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
-import { useAppSelector } from '../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { RootState } from '../../../app/store'
 import { selectAllLocalizacoes } from '../../localizacoes/localizacaoApi'
-import { useCreateObraMutation } from '../data/obraApi'
+import { useUpdateObraMutation } from '../data/obraApi'
+import { selectCurrentObra } from '../data/obraSlice'
 import {
   ObraFormErrorResponse,
   ObraForm,
@@ -12,8 +13,6 @@ import {
   defaultObraFormErrorResponse,
   initialTipoObraOptionsState,
 } from '../data/ObraInterfaces'
-import { renderLocalizacoes } from './business.logic'
-import { onChangeTipoObra } from './events.logic'
 import ComboBox from '../../../components/reusable/ComboBox'
 import ControlledInput from '../../../components/reusable/ControlledInput'
 import { selectEstantesByTipoEstante } from '../../estantes/data/estanteSlice'
@@ -22,27 +21,30 @@ import {
   onInputChange,
   onChangeSelect,
 } from '../../../utils/reusable/CommonFormEventsHandler'
-import {
-  EMPTY,
-  EMPTY_OPTION,
-} from '../../../components/reusable/data/Constants'
-import { sendCreateObraRequest } from '../manage/business.logic'
+import { EMPTY } from '../../../components/reusable/data/Constants'
+import { sendUpdateObraRequest } from '../manage/business.logic'
+import { renderLocalizacoes } from '../NovaObra/business.logic'
+import { onChangeTipoObra } from '../NovaObra/events.logic'
 
-export interface NovaObraModalProps {
-  hideModal: () => void
+export interface UpdateObraModalProps {
+  closeModal: () => void
 }
 
-const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
+const UpdateObraModal: React.FC<UpdateObraModalProps> = ({ closeModal }) => {
   const inputRef = useRef<HTMLInputElement>(null)
+  const dispatch = useAppDispatch()
+  const currentObra = useAppSelector(selectCurrentObra)
   const [formState, setFormState] = useState<ObraForm>(defaultObraFormState)
   const [error, setError] = useState<ObraFormErrorResponse>(
     defaultObraFormErrorResponse
   )
 
-  const [isCreateObraRequestSuccess, setIsCreateObraRequestSuccess] =
+  const [isFirstLaunch, setIsFirstLaunch] = useState<Boolean>(true)
+
+  const [isUpdateObraRequestSuccess, setIsUpdateObraRequestSuccess] =
     useState<Boolean>(false)
 
-  const [createObra, { isLoading, isError }] = useCreateObraMutation()
+  const [updateObra, { isLoading, isError }] = useUpdateObraMutation()
 
   const estanteEntities = useSelector((state: RootState) =>
     selectEstantesByTipoEstante(state, formState.type.label as string)
@@ -66,70 +68,46 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
     label: string = EMPTY
   ) => onChangeSelect(setFormState, name, value, label)
 
-  const onChangeTipoDeObra = (
-    name: string,
-    value: string | number,
-    label: string = EMPTY
-  ) => onChangeTipoObra(setFormState, inputRef, { value, label }, formState)
-
-  const onClickConfirmar = () =>
-    sendCreateObraRequest(formState, createObra, setError, (isCreated) => {
-      setIsCreateObraRequestSuccess(isCreated)
-      clearFormFields()
-    })
+  const onClickConfirmar = () => {
+    sendUpdateObraRequest(
+      formState,
+      updateObra,
+      setError,
+      dispatch,
+      (isUpdated) => {
+        setIsUpdateObraRequestSuccess(isUpdated)
+        clearFormFields()
+        onClickCancelar()
+      }
+    )
+  }
 
   const onClickCancelar = () => {
+    setIsFirstLaunch(true)
     closeModal()
     clearFormFields()
   }
 
-  const clearFormFields = () => setFormState(defaultObraFormState)
+  const clearFormFields = () => {}
 
-  const closeModal = () => {
-    hideModal()
-    clearFormFields()
-  }
-
-  /**
-   * Since there are two dynamic properties which are Tutor and editora
-   * This useEffect controls this properties dynamically, which means,
-   * each time the type of the Obra which is Monografia or Livro is changed
-   * Editora or Tutor property is added to the formState, with its value empty,
-   * this useEffect works in conjuction with onChangeTipo Obra function
-   */
   useEffect(() => {
-    const element = inputRef.current as HTMLInputElement
-    if (element) {
-      const name = element.name
-
-      element.value = ''
-
-      // This code must be refactored
-      setFormState((prev) => ({
-        ...prev,
-        [name]: '',
-        type: formState.type,
-      }))
-    }
-
-    // Every time we change the type of the Obra, we must empty the previous estante selected to prevent inconsistencies
-    setFormState((prev) => ({ ...prev, estante: EMPTY_OPTION }))
-  }, [formState.type])
+    setFormState(currentObra as ObraForm)
+  }, [currentObra])
 
   useEffect(() => {
     if (isLoading) {
       toast.dismiss()
-      toast.loading('Tentando criar nova obra...')
+      toast.loading('Tentando atualizar obra...')
     } else {
-      if (isCreateObraRequestSuccess) {
+      if (isUpdateObraRequestSuccess) {
         toast.dismiss()
-        toast.success('Obra criada com sucesso!', {
+        toast.success('Obra atualizada com sucesso!', {
           duration: 5000,
         })
-        setIsCreateObraRequestSuccess(false)
+        setIsUpdateObraRequestSuccess(false)
       }
     }
-  }, [isLoading, isCreateObraRequestSuccess])
+  }, [isLoading, isUpdateObraRequestSuccess])
 
   return (
     <>
@@ -152,35 +130,13 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
               "
                 id="gerirObraLabel"
               >
-                Registar Nova Obra
+                Atualizar Obra
               </h4>
               {isError && (
                 <span className="text-danger mb-1">
                   <strong>Erro:</strong> {error.message}
                 </span>
               )}
-
-              <div id="obra-type">
-                <div className="row">
-                  <div className="col-lg-6">
-                    <ComboBox
-                      id="tipoObra"
-                      label="Tipo de Obra"
-                      value={formState.type}
-                      color="secondary"
-                      options={initialTipoObraOptionsState}
-                      onChange={onChangeTipoDeObra}
-                    />
-                    {!formState.type && (
-                      <span className="text-warning">
-                        Nota: Certifique-se de escolher o tipo de obra!
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <hr />
-              </div>
 
               <div className="data-and-actions">
                 <div className="row">
@@ -221,7 +177,7 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                       <ControlledInput
                         id="editora"
                         label="Editora"
-                        value={formState.editora ?? ''}
+                        value={formState.editora as string}
                         color="secondary"
                         name="editora"
                         type="text"
@@ -237,7 +193,7 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                       <ControlledInput
                         id="tutor"
                         label="Tutor"
-                        value={formState.tutor ?? ''}
+                        value={formState.tutor as string}
                         color="secondary"
                         name="tutor"
                         type="text"
@@ -250,19 +206,6 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                   </div>
                 </div>
                 <div className="row">
-                  <div className="col-sm-12 col-md-6 col-lg-5 mb-2">
-                    <ControlledInput
-                      type="number"
-                      name="quantidadeInicial"
-                      value={formState.quantidadeInicial}
-                      error={error.errors?.quantidadeInicial}
-                      color="secondary"
-                      label="Quantidade"
-                      id="quantidade"
-                      onChange={(event) => onInputChange(event, setFormState)}
-                      placeholder="Digite a quantidade aqui!"
-                    />
-                  </div>
                   <div className="col-sm-12 col-md-6 col-lg-4 mb-2">
                     <ControlledInput
                       type="number"
@@ -319,8 +262,8 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                       me-3
                       w-100
                     "
-                      onClick={onClickConfirmar}
                       disabled={isLoading}
+                      onClick={onClickConfirmar}
                     >
                       <span className="me-1">Confirmar</span>
 
@@ -363,4 +306,4 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
   )
 }
 
-export default NovaObraModal
+export default UpdateObraModal
