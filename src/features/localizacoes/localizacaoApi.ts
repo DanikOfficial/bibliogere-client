@@ -15,6 +15,8 @@ export interface Localizacao {
   designacao: string
 }
 
+export interface LocalizacaoEntity extends Localizacao {}
+
 const localizacoesAdapter = createEntityAdapter<Localizacao>({
   selectId: (response) => {
     return response.codigo

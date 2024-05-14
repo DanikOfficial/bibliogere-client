@@ -17,7 +17,6 @@ interface Props {
   options: Option[]
   error?: string
 }
-//HTMLElement | JSX.Element[] | JSX.Element
 
 let ComboBox: React.FC<Props> = ({
   color,

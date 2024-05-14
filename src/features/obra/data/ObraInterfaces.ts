@@ -2,19 +2,24 @@ import {
   Monografia,
   Livro,
 } from '../../../components/reusable/data/CommonInterfaces'
-import type { EstanteResponse } from '../../estantes/data/EstanteInterfaces'
+import type { EstanteEntity } from '../../estantes/data/EstanteInterfaces'
 import type Option from '../../../app/interfaces/Option'
+import { EMPTY_OPTION } from '../../../components/reusable/data/Constants'
+import { LocalizacaoEntity } from '../../localizacoes/localizacaoApi'
 
 export type ObraType = Monografia | Livro | string
 
 export interface ObraEntity {
+  [key: string]: any
+  type: string
   codigo: number
   autor: string
   titulo: string
   ano: number
   quantidadeAtual: number
-  estante: EstanteResponse
+  estante: EstanteEntity
   nomeEstante: string
+  localizacao: LocalizacaoEntity
   localizacaoDesignacao: string
   tipoObra: string
   tutor?: string
@@ -38,6 +43,7 @@ export interface Obra {
 
 export interface ObraForm {
   [key: string]: string | number | undefined | Option
+  codigo?: number
   type: Option
   autor: string
   titulo: string
@@ -53,8 +59,23 @@ export interface ObraForm {
 export interface ObraRequest {
   obra: Obra
   codigoEstante: number
-  codigoObra?: number
   codigoLocalizacao: number
+}
+
+export interface UpdateObraRequest {
+  codigoObra: number
+  codigoEstante: number
+  codigoLocalizacao: number
+  data: {
+    type?: string
+    autor?: string
+    titulo?: string
+    ano?: number | string
+    quantidadeInicial?: number | string
+    quantidadeAtual?: number
+    tutor?: string
+    editora?: string
+  }
 }
 
 export type SingleObra = {
@@ -63,7 +84,7 @@ export type SingleObra = {
   arg: unknown
 }
 
-export interface ObraFormErrorState {
+export interface ObraFormErrorResponse {
   error: boolean
   message: string
   errors?: {
@@ -83,3 +104,31 @@ export interface FormSearchState {
   editora?: string
   tutor?: string
 }
+
+export const defaultObraFormState: ObraForm = {
+  type: EMPTY_OPTION,
+  autor: '',
+  ano: '',
+  quantidadeInicial: '',
+  titulo: '',
+  estante: EMPTY_OPTION,
+  localizacao: EMPTY_OPTION,
+}
+
+export const defaultObraFormErrorResponse: ObraFormErrorResponse = {
+  error: false,
+  message: '',
+  errors: {
+    titulo: '',
+    autor: '',
+    ano: '',
+    quantidadeInicial: '',
+    editora: '',
+    tutor: '',
+  },
+}
+
+export const initialTipoObraOptionsState = [
+  { value: 'livro', label: 'Livro' },
+  { value: 'monografia', label: 'Monografia' },
+]

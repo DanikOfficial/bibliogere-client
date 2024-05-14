@@ -8,14 +8,16 @@ import './assets/bootstrap.bundle'
 import localizacaoApi from './features/localizacoes/localizacaoApi'
 import App from './App'
 import estanteApi from './features/estantes/data/estanteApi'
-
-// Initialize
+import obraApi from './features/obra/data/obraApi'
 
 // Localizações
 store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
 
 // Estantes
 store.dispatch(estanteApi.endpoints.getEstantes.initiate())
+
+// Livros
+store.dispatch(obraApi.endpoints.getObras.initiate())
 
 ReactDOM.render(
   <React.StrictMode>

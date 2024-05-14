@@ -7,11 +7,7 @@ import {
 
 export type EstanteType = Monografia | Livro | ''
 
-export interface EstanteResponse {
-  codigo: number
-  nome: string
-  tipoEstante: string
-}
+export interface EstanteResponse extends EstanteEntity {}
 
 export interface EstanteEntity {
   codigo: number
