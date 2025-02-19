@@ -1,5 +1,5 @@
 import React, { SetStateAction } from 'react'
-import { AnyAction, Dispatch, ThunkDispatch } from '@reduxjs/toolkit'
+import { AnyAction, Dispatch } from '@reduxjs/toolkit'
 import type { ErrorResponse } from '../../../app/interfaces/ErrorResponse'
 import {
   ObraFormErrorResponse,
@@ -18,9 +18,9 @@ export const sendCreateObraRequest = async (
   onCreateObraSuccess: (isCreated: Boolean) => void
 ) => {
   const novaObraRequest: ObraRequest = {
-    codigoEstante: obra.estante.value as number,
-    codigoLocalizacao: obra.localizacao.value as number,
     obra: {
+      codigoEstante: obra.estante.value as number,
+    codigoLocalizacao: obra.localizacao.value as number,
       ano: obra.ano,
       autor: obra.autor,
       titulo: obra.titulo,
@@ -30,16 +30,18 @@ export const sendCreateObraRequest = async (
       ...(obra.editora && { editora: obra.editora }),
     },
   }
+  let isSuccess = false
 
   try {
-    await createObra(novaObraRequest)
-    onCreateObraSuccess(true)
+    await createObra(novaObraRequest).unwrap()
+    isSuccess = true
   } catch (error) {
     handleErrorResponse(
       error as ErrorResponse<ObraFormErrorResponse>,
       setUIError
     )
   }
+  onCreateObraSuccess(isSuccess)
 }
 
 export const sendUpdateObraRequest = async (
@@ -50,6 +52,7 @@ export const sendUpdateObraRequest = async (
   onUpdateObraSuccess: (isUpdate: Boolean) => void
 ) => {
   const obraType = obra.type.value as string
+  let isSuccess: boolean = false
 
   const updateObraRequest: UpdateObraRequest = {
     codigoEstante: obra.estante.value as number,
@@ -66,8 +69,8 @@ export const sendUpdateObraRequest = async (
   }
 
   try {
-    await updateObra(updateObraRequest)
-    onUpdateObraSuccess(true)
+    await updateObra(updateObraRequest).unwrap()
+    isSuccess = true
     dispatch(obraUpdateCanceled())
   } catch (error) {
     handleErrorResponse(
@@ -75,6 +78,7 @@ export const sendUpdateObraRequest = async (
       setUIError
     )
   }
+  onUpdateObraSuccess(isSuccess)
 }
 
 export const sendDeleteObraRequest = async (
@@ -83,7 +87,7 @@ export const sendDeleteObraRequest = async (
   deleteObra: any
 ) => {
   try {
-    await deleteObra(codigoObra)
+    await deleteObra(codigoObra).unwrap()
   } catch (error) {
     handleErrorResponse(
       error as ErrorResponse<ObraFormErrorResponse>,

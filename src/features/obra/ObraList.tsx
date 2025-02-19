@@ -42,15 +42,11 @@ const ObraList: FC<ObraListProps> = ({ showModal }) => {
     },
   ] = useDeleteObraMutation()
 
-  // TODO: Implement this using API
   const onClickALterarObra = (obra: ObraEntity) => {
     sendGetObraRequest(dispatch, obra.codigo, (isSuccess) => {
       isSuccess && showModal()
     })
   }
-
-  // TODO: We wont work on this now, since its not part of the first implementation
-  const onClickAdicionarObra = (obra: ObraEntity) => {}
 
   const onCLickApagarObra = ({ codigo }: ObraEntity) => {
     confirmDelete(
@@ -65,8 +61,7 @@ const ObraList: FC<ObraListProps> = ({ showModal }) => {
     obrasArr,
     onClickALterarObra,
     onCLickApagarObra,
-    onClickAdicionarObra,
-    true
+    true,
   )
 
   useEffect(() => {

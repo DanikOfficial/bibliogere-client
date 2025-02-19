@@ -14,6 +14,7 @@ export type Livro = 'livro' | 'Livro'
  */
 export interface CrudInitialState<T, S = never> {
   all: EntityState<T>
+  filtered?: EntityState<T>
   selectedEntity: T | S
   isFetchingEntities?: Boolean
   isUpdating: boolean

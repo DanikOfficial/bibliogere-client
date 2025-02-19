@@ -75,7 +75,8 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
   const onClickConfirmar = () =>
     sendCreateObraRequest(formState, createObra, setError, (isCreated) => {
       setIsCreateObraRequestSuccess(isCreated)
-      clearFormFields()
+      isCreated && clearFormFields()
+      toast.dismiss()
     })
 
   const onClickCancelar = () => {

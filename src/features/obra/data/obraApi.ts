@@ -17,7 +17,6 @@ import {
 
 const logger = Logger.getInstance()
 
-// TODO: After finishing admin features, implement Atendente obra features
 const obraApi = api.injectEndpoints({
   endpoints: (build) => ({
     getObras: build.query<ObraResponse[], void>({
@@ -75,8 +74,8 @@ const obraApi = api.injectEndpoints({
       },
     }),
     createObra: build.mutation<ObraResponse, ObraRequest>({
-      query: ({ codigoLocalizacao, codigoEstante, obra }) => ({
-        url: `/admin/obras/estante/${codigoEstante}/localizacao/${codigoLocalizacao}`,
+      query: ({ obra }) => ({
+        url: `/admin/obras`,
         method: 'POST',
         body: obra,
       }),
@@ -118,6 +117,17 @@ const obraApi = api.injectEndpoints({
         }
       },
     }),
+    findObras: build.query<ObraResponse[], string>({
+      query: (titulo: string) => `/obras/pesquisa?titulo=${titulo}`,
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+
+        if (data) {
+          logger.log('Get obras request successfully executed!')
+          dispatch(obrasAdded(data))
+        }
+      },
+    })
   }),
 })
 

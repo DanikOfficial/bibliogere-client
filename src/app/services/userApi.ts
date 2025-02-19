@@ -21,13 +21,6 @@ export interface UserData {
   permissoes: []
 }
 
-interface ApiResponse {
-  status: number
-  error: boolean
-  message: string
-  data: UserData | Error
-}
-
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
     login: build.mutation({

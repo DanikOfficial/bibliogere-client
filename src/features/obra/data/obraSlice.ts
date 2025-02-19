@@ -43,6 +43,11 @@ const obraSlice = createSlice({
     obrasAdded: (state, { payload: obras }: PayloadAction<ObraEntity[]>) => {
       logger.log(`Adding fetched obras to the Adapter.`)
       obrasAdapter.setAll(state.all, obras)
+
+    },
+    filteredObrasAdded: (state, { payload: obras }: PayloadAction<ObraEntity[]>) => {
+      logger.log(`Adding fetched obras to the Adapter.`)
+      obrasAdapter.setAll(state.all, obras)
     },
     obraDeleted: (state, { payload: obraCodigo }: PayloadAction<number>) => {
       logger.log(

@@ -11,5 +11,8 @@ export const handleErrorResponse = <E extends ErrorResponse<T>, T>(
   setUIErrorState: React.Dispatch<SetStateAction<T>>
 ): void => {
   const { data } = error
+
+  console.log("Error Data ", data )
+
   setUIErrorState(data as T)
 }

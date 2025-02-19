@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 const Dashboard: React.FC = () => (
   <section id="app" className="row mx-0 border-2 h-100">
     <Sidebar />
-    <section className="col pt-2 px-2 px-lg-4 vh-100 overflow-auto">
+    <section className="col pt-2 px-1 px-lg-3 vh-100 overflow-auto">
       <Outlet />
     </section>
   </section>

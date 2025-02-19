@@ -5,7 +5,6 @@ export const renderObras = (
   obras: ObraEntity[],
   onClickAlterarObra: (obra: ObraEntity) => void,
   onClickApagarObra: ({ codigo }: ObraEntity) => void,
-  onClickAdicionarObra: (obra: ObraEntity) => void,
   isBeingManaged: boolean = false
 ) => {
   const renderedObras = obras.map((obra) => {
@@ -13,7 +12,6 @@ export const renderObras = (
       obra,
       onClickAlterarObra,
       onClickApagarObra,
-      onClickAdicionarObra,
       isBeingManaged,
     }
 
