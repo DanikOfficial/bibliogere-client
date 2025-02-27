@@ -4,9 +4,9 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useLoginMutation } from '../../../app/services/userApi'
 import { setCredentials } from '../userSlice'
 import type { AuthState } from '../userSlice'
-
 import type { LoginRequest, ErrorState } from '../../../app/services/userApi'
 import Input from '../../../components/reusable/Input'
+import { getEntryPoint } from '../../../utils/entrypoint'
 
 const Credentials: FC = () => {
   const dispatch = useAppDispatch()
@@ -40,6 +40,7 @@ const Credentials: FC = () => {
         setError(initialErrorState)
 
         const { nome, token, permissoes } = await login(formState).unwrap()
+
         dispatch(
           setCredentials({
             currentUser: nome,
@@ -48,7 +49,19 @@ const Credentials: FC = () => {
           } as AuthState)
         )
 
-        navigate('/dashboard/obras')
+        const entrypoint = getEntryPoint(permissoes[0].nome)
+        console.log('Entrypoint ', entrypoint)
+
+        if (entrypoint) {
+          navigate(entrypoint.url)
+        } else {
+          console.error('Invalid Role: ', permissoes[0].nome)
+          setError({
+            error: true,
+            message: 'Utilizador Invalido',
+            errors: { username: '' },
+          })
+        }
       } catch (err) {
         const data = err as ErrorState
         setError((prev) => ({ ...prev, ...data }))

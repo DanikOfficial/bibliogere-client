@@ -31,6 +31,8 @@ export interface ObraResponse extends ObraEntity {}
 export interface Obra {
   [key: string]: string | number | undefined
   codigo?: number
+  codigoEstante?: number
+  codigoLocalizacao?: number
   type: ObraType
   autor: string
   titulo: string
@@ -58,8 +60,6 @@ export interface ObraForm {
 
 export interface ObraRequest {
   obra: Obra
-  codigoEstante: number
-  codigoLocalizacao: number
 }
 
 export interface UpdateObraRequest {

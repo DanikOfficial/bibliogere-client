@@ -29,7 +29,8 @@ export const sendCreateEstanteRequest = async (
       nome: estante.nome,
       tipoEstante: estante.tipoEstante,
     }
-    await createEstante(createEstanteRequest)
+    const response = await createEstante(createEstanteRequest).unwrap()
+    console.log("Estante response ", response)
     onCreateEstanteSuccess(true)
   } catch (error: unknown) {
     handleErrorResponse(

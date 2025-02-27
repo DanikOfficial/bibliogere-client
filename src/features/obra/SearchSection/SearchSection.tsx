@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import ComboBox from '../../../components/reusable/ComboBox'
 import Input from '../../../components/reusable/Input'
 import ControlledInput from '../../../components/reusable/ControlledInput'
@@ -15,16 +15,18 @@ import {
   onChangeTipoObraComboBox,
 } from './events.logic'
 import { EMPTY, livro } from '../../../components/reusable/data/Constants'
+import toast from 'react-hot-toast'
+import obraApi from '../data/obraApi'
+import { useAppDispatch } from '../../../app/hooks'
 
 const SearchSection: React.FC = () => {
+  const dispatch = useAppDispatch()
   const ref = useRef<HTMLInputElement>(null)
   const [tipoObra, setTipoObra] = useState<ObraType>(livro)
   const [isAdvanced, setIsAdvanced] = useState<boolean>(false)
   const [titulo, setTitulo] = useState<string>(EMPTY)
   const [advancedSearchState, setAdvancedSearchState] =
     useState<FormSearchState>(InitialAdvancedSearchState)
-
-  const canSearch = useMemo(() => Boolean(titulo), [titulo])
 
   const tipoObraOptions = tipoObraOptionsInitialState
 
@@ -39,6 +41,16 @@ const SearchSection: React.FC = () => {
     advancedSearchState
   )
 
+  /** ✅ Debounce API calls to reduce unnecessary re-renders */
+  const onClickPesquisar = useCallback(() => {
+    toast.loading('Processando...')
+    dispatch(
+      obraApi.endpoints.findObras.initiate(titulo, {
+        forceRefetch: true,
+      })
+    ).then(() => toast.dismiss())
+  }, [titulo, dispatch])
+
   useEffect(() => {
     const element = ref.current as HTMLInputElement
     const name = element.name
@@ -51,24 +63,11 @@ const SearchSection: React.FC = () => {
     <section id="search-section" className="row mx-0">
       <div
         id="search-fields"
-        className="rounded bg-white py-2 px-3 mb-2 col col-xl-11 border-2"
+        className="rounded bg-white py-2 px-3 mb-2 col-lg-11 border-2"
       >
         <h5 className="text-center text-prevent my-2">Pesquisar Obra</h5>
         <div className="row mb-4">
-          <div className="col col-xl-7 mb-2 mb-xl-0">
-            <Input
-              name="titulo"
-              id="tituloSearch"
-              label="Titulo"
-              color="secondary"
-              onChange={(event) => onChangeTitulo(event, setTitulo)}
-              type="text"
-              placeholder={`Pesquise ${
-                tipoObra === 'livro' ? 'o livro' : 'a monografia'
-              } aqui! ex: Sistemas de Informação`}
-            />
-          </div>
-          <div className="col-xl-3 mb-3 mb-xl-0">
+          <div className="rounded bg-white py-2 px-3 mb-2">
             {/*
             
             FIXME: fix this
@@ -81,26 +80,33 @@ const SearchSection: React.FC = () => {
               onChange={onChangeTipoObraSelect}
               options={tipoObraOptions}
             /> */}
-          </div>
-          <div className="col-sm-5 col-md-4 col-lg-2 col-xl-2 mt-lg-4">
-            <button
-              className="
-            btn
-            shadow-none
-            btn-primary
-            custom-height-btn
-            d-flex
-            align-items-center
-            justify-content-center
-            w-100
-          "
-              disabled={!canSearch}
-            >
-              <span>Pesquisar</span>
-              <i className="bi bi-search ms-2"></i>
-            </button>
+            <div className="row">
+              <div className="col-lg-10 mb-2">
+                <ControlledInput
+                  name="titulo"
+                  color="secondary"
+                  id="titulo"
+                  value={titulo}
+                  onChange={(event) => onChangeTitulo(event, setTitulo)}
+                  type="text"
+                  placeholder="Digite o titulo da obra!"
+                />
+              </div>
+              <div className="col-lg-2 d-flex">
+                <button
+                  disabled={!Boolean(titulo)}
+                  onClick={onClickPesquisar}
+                  className="btn btn-primary d-flex align-items-center"
+                >
+                  <span>Pesquisar</span> <i className="bi bi-search ms-2"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/*
+            TODO: Paused feature
         <div id="advanced-search">
           <p className="text-secondary fs-5 fw-bold mb-1">
             Pesquisa avançada
@@ -117,7 +123,7 @@ const SearchSection: React.FC = () => {
               }
             ></i>
           </p>
-        </div>
+        </div> */}
         <div
           id="advanced-search-fields"
           className={`d-${isAdvanced ? 'block' : 'none'}`}

@@ -1,69 +1,35 @@
 import { useEffect, useState, useCallback } from 'react'
 
-const linksArr: link[] = [
-  {
-    key: 0,
-    path: 'obras',
-    name: 'Obras',
-    icon: 'bi bi-card-list me-2',
-    role: 'ROLE_ADMIN',
-  },
-  {
-    key: 1,
-    path: 'estantes',
-    name: 'Estantes',
-    icon: 'bi bi-bank me-2',
-    role: 'ROLE_ADMIN',
-  },
-  {
-    key: 2,
-    path: 'relatorios',
-    name: 'Relatórios',
-    icon: 'bi bi-newspaper me-2',
-    role: 'ROLE_ADMIN',
-  },
-  {
-    key: 3,
-    path: 'utilizadores',
-    name: 'Utilizadores',
-    icon: 'bi bi-person me-2',
-    role: 'ROLE_ADMIN',
-  },
-  {
-    key: 4,
-    path: 'definicoes',
-    name: 'Definições',
-    icon: 'bi bi-gear me-2',
-    role: 'ROLE_ADMIN, ROLE_ATENDENTE',
-  },
-]
-
 export interface link {
-  key: number
-  path: string
-  name: string
-  icon: string
-  role: string
+  key?: number;
+  path: string;
+  name?: string; // This is optional because a link can not have a name if its a direct action
+  icon?: string; // This is optional because a link can not have a  if its a direct action
+  roles: string[];
+  isChild: boolean; // This is for links that are not bound to navBar or are direct action for a specific view
 }
 
+export const linksArr: link[] = [
+  { key: 0, path: 'obras', name: 'Obras', icon: 'bi bi-card-list me-2', roles: ['ROLE_ADMIN'], isChild: false },
+  { key: 1, path: 'estantes', name: 'Estantes', icon: 'bi bi-bank me-2', roles: ['ROLE_ADMIN'], isChild: false },
+  { key: 2, path: 'relatorios', name: 'Relatórios', icon: 'bi bi-newspaper me-2', roles: ['ROLE_ADMIN'], isChild: false },
+  { key: 3, path: 'utilizadores', name: 'Utilizadores', icon: 'bi bi-person me-2', roles: ['ROLE_ADMIN'], isChild: false },
+  { key: 4, path: 'emprestimos/list', name: 'Empréstimos', icon: 'bi bi-gear me-2', roles: ['ROLE_ATENDENTE'], isChild: false },
+  { key: 5, path: 'definicoes', name: 'Definições', icon: 'bi bi-gear me-2', roles: ['ROLE_ADMIN', 'ROLE_ATENDENTE'], isChild: false },
+  { path: "emprestimos/create", isChild: true, roles: ["ROLE_ATENDENTE"] },
+];
+
+
 const useLinks = (role: string) => {
-  const [links, setLinks] = useState<link[]>([
-    {
-      key: 0,
-      path: '',
-      name: '',
-      icon: '',
-      role: '',
-    },
-  ])
+  const [links, setLinks] = useState<link[]>([])
 
   const fetchLinks = useCallback(() => {
-    setLinks(linksArr.filter((link) => link.role.includes(role)))
+    setLinks(linksArr.filter((link) => link.roles.includes(role) && !link.isChild))
   }, [role])
 
   useEffect(() => {
     fetchLinks()
-  }, [role, fetchLinks])
+  }, [fetchLinks])
 
   return links
 }

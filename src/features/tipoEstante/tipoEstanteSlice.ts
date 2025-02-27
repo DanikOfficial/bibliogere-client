@@ -1,9 +1,6 @@
 import { TipoEstante } from './interfaces'
-import Logger from '../../utils/reusable/Logger'
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
-
-const logger = Logger.getInstance()
 
 const comparer = (
   firstTipoEstante: TipoEstante,

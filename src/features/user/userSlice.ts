@@ -5,17 +5,31 @@ export type AuthState = {
   currentUser: string
   token: string
   loggedIn: boolean
-  role: string
+  role: {
+    codigo: number
+    nome: string
+  }
+}
+
+// Load authentication state from sessionStorage
+const loadAuthState = (): AuthState => {
+  const storedAuth = sessionStorage.getItem("authState")
+  return storedAuth
+    ? JSON.parse(storedAuth)
+    : {
+        currentUser: '',
+        token: '',
+        loggedIn: false,
+        role: {
+          codigo: -1,
+          nome: "",
+        },
+      }
 }
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    currentUser: '',
-    token: '',
-    loggedIn: false,
-    role: '',
-  } as AuthState,
+  initialState: loadAuthState(),
   reducers: {
     setCredentials: (
       state,
@@ -25,12 +39,19 @@ const userSlice = createSlice({
       state.token = token
       state.role = role
       state.loggedIn = true
+
+      // Save to sessionStorage
+      sessionStorage.setItem("authState", JSON.stringify(state))
     },
     signOut: (state) => {
       state.currentUser = ''
       state.token = ''
-      state.role = ''
+      state.role.codigo = -1
+      state.role.nome = ""
       state.loggedIn = false
+
+      // Remove from sessionStorage
+      sessionStorage.removeItem("authState")
     },
   },
 })

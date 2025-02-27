@@ -10,7 +10,8 @@ interface Props {
   error?: string | undefined | null
   color: string
   reference?: React.RefObject<HTMLInputElement>
-  value: string | number
+  value: string | number | undefined
+  addSpace?: boolean
 }
 
 
@@ -25,6 +26,7 @@ let ControlledInput: React.FC<Props> = ({
   reference,
   label,
   id,
+  addSpace
 }) => {
   let content: JSX.Element = (
     <>
@@ -42,7 +44,7 @@ let ControlledInput: React.FC<Props> = ({
         ref={reference}
         onChange={onChange}
         className={`form-control shadow-none rounded-3 border-2 border-${
-          error ? 'danger' : `${color}`
+          error ? 'danger' : `${color} ${ addSpace ? 'mb-2' : ""}`
         }`}
       />
       <div className="form-text text-danger">{error}</div>

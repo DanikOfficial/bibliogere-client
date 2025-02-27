@@ -16,9 +16,9 @@ const Sidebar: React.FC = () => {
   const currentUser = useAppSelector(selectCurrentUser)
   const role = useAppSelector(selectRole)
 
-  // Testing only
-  const links = useLinks('ROLE_ADMIN')
+    const links = useLinks(role.nome)
 
+  // TODO: REset app state
   const exit = (): void => {
     dispatch(signOut)
     navigate('/')

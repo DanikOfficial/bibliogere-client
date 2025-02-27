@@ -2,9 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { store } from './app/store'
 import { Provider } from 'react-redux'
-import './assets/main.min.css'
+import { CartProvider } from './features/emprestimo/cart/CartContext'
 import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
+import './assets/main.min.css'
 import localizacaoApi from './features/localizacoes/localizacaoApi'
 import App from './App'
 import estanteApi from './features/estantes/data/estanteApi'
@@ -22,7 +23,9 @@ store.dispatch(obraApi.endpoints.getObras.initiate())
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+        <CartProvider>
+          <App />
+        </CartProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

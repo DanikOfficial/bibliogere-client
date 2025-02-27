@@ -11,7 +11,6 @@ import {
   ObraForm,
   defaultObraFormState,
   defaultObraFormErrorResponse,
-  initialTipoObraOptionsState,
 } from '../data/ObraInterfaces'
 import ComboBox from '../../../components/reusable/ComboBox'
 import ControlledInput from '../../../components/reusable/ControlledInput'
@@ -24,7 +23,6 @@ import {
 import { EMPTY } from '../../../components/reusable/data/Constants'
 import { sendUpdateObraRequest } from '../manage/business.logic'
 import { renderLocalizacoes } from '../NovaObra/business.logic'
-import { onChangeTipoObra } from '../NovaObra/events.logic'
 
 export interface UpdateObraModalProps {
   closeModal: () => void
@@ -38,8 +36,6 @@ const UpdateObraModal: React.FC<UpdateObraModalProps> = ({ closeModal }) => {
   const [error, setError] = useState<ObraFormErrorResponse>(
     defaultObraFormErrorResponse
   )
-
-  const [isFirstLaunch, setIsFirstLaunch] = useState<Boolean>(true)
 
   const [isUpdateObraRequestSuccess, setIsUpdateObraRequestSuccess] =
     useState<Boolean>(false)
@@ -83,7 +79,6 @@ const UpdateObraModal: React.FC<UpdateObraModalProps> = ({ closeModal }) => {
   }
 
   const onClickCancelar = () => {
-    setIsFirstLaunch(true)
     closeModal()
     clearFormFields()
   }

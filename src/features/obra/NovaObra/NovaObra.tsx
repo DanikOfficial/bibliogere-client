@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react'
+import {  useState } from 'react'
 import NovaObraModal, { NovaObraModalProps } from './NovaObraModal'
 
 const NovaObra: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null)
   const [isNovaObraModalDisplayed, setIsNovaObraModalDisplayed] =
     useState<Boolean>(false)
 
