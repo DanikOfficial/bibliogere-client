@@ -87,7 +87,7 @@ const Credentials: FC = () => {
               type="text"
               onChange={handleOnChange}
               error={error.errors.username}
-              color="prevent"
+              color="primary"
               placeholder="Nome do utilizador"
             />
           </div>
@@ -101,7 +101,7 @@ const Credentials: FC = () => {
               name="password"
               type="password"
               onChange={handleOnChange}
-              color="prevent"
+              color="primary"
               placeholder="Palavra-passe do utilizador"
             />
           </div>

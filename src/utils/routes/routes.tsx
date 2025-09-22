@@ -10,7 +10,9 @@ import CreateEmprestimo from '../../features/emprestimo/CreateEmprestimo'
 import EmprestimosEntrypoint from '../../features/emprestimo/EmprestimosEntrypoint'
 import EmprestimoView from '../../features/emprestimo/EmprestimoView'
 import Unauthorized from '../../components/Unauthenticated'
-import RelatoriosView from '../../features/relatorios/RelatoriosView'
+import GerarRelatoriosView from '../../features/relatorios/RelatoriosView'
+import RelatorioEmprestimoView from '../../features/relatorios/emprestimos/RelatorioEmprestimoView'
+import RelatorioObrasView from '../../features/relatorios/obras/RelatorioObrasView'
 
 const routes: RouteObject[] = [
   {
@@ -50,6 +52,18 @@ const routes: RouteObject[] = [
                 element: <EmprestimoView />, // This is the component that will be rendered
               },
             ],
+          },
+          {
+            path: 'relatorios',
+            element: <GerarRelatoriosView />,
+          },
+          {
+            path: 'relatorios/emprestimos',
+            element: <RelatorioEmprestimoView />,
+          },
+          {
+            path: 'relatorios/obras',
+            element: <RelatorioObrasView />,
           },
         ],
       },
