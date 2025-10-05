@@ -10,6 +10,8 @@ import localizacaoApi from './features/localizacoes/localizacaoApi'
 import App from './App'
 import estanteApi from './features/estantes/data/estanteApi'
 import obraApi from './features/obra/data/obraApi'
+import { questaoApi } from './app/services/questaoApi'
+
 
 // Localizações
 store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
@@ -19,6 +21,9 @@ store.dispatch(estanteApi.endpoints.getEstantes.initiate())
 
 // Livros
 store.dispatch(obraApi.endpoints.getObras.initiate())
+
+// Questao
+store.dispatch(questaoApi.endpoints.getQuestoes.initiate())
 
 ReactDOM.render(
   <React.StrictMode>

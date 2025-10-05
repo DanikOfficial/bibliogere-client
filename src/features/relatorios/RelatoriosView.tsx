@@ -33,7 +33,7 @@ const GerarRelatoriosView = () => {
           }
         />
       )}
-      <section id="relatórios" className="pt-3">
+      <section id="relatórios">
         <SectionName>Gerar Relatórios</SectionName>
         <div className="container-fluid">
           <div className="d-flex flex-wrap">

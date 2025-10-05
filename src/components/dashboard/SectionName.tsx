@@ -1,7 +1,7 @@
 const SectionName: React.FC = ({ children }) => (
-  <h4 className="text-center mb-4 text-primary  display-7 fw-light">
+  <h2 className="text-center mb-4 text-primary  display-7 fw-bold pt-3">
     {children}
-  </h4>
+  </h2>
 )
 
 export default SectionName

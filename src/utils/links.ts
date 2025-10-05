@@ -16,7 +16,7 @@ export const linksArr: link[] = [
   { key: 2, path: 'relatorios', name: 'Relatórios', icon: 'bi bi-newspaper me-2', roles: ['ROLE_ADMIN'], isChild: false, isDisabled: false },
   { key: 3, path: 'utilizadores', name: 'Utilizadores', icon: 'bi bi-person me-2', roles: ['ROLE_ADMIN'], isChild: false, isDisabled: true },
   { key: 4, path: 'emprestimos/list', name: 'Empréstimos', icon: 'bi bi-gear me-2', roles: ['ROLE_ATENDENTE'], isChild: false, isDisabled: false },
-  { key: 5, path: 'definicoes', name: 'Definições', icon: 'bi bi-gear me-2', roles: ['ROLE_ADMIN', 'ROLE_ATENDENTE'], isChild: false, isDisabled: true },
+  { key: 5, path: 'definicoes', name: 'Definições', icon: 'bi bi-gear me-2', roles: ['ROLE_ADMIN', 'ROLE_ATENDENTE'], isChild: false, isDisabled: false },
   { path: "emprestimos/create", isChild: true, roles: ["ROLE_ATENDENTE"], isDisabled: false },
   { path: "relatorios/emprestimos", isChild: true, roles: ["ROLE_ADMIN"], isDisabled: false },
   { path: "relatorios/obras", isChild: true, roles: ["ROLE_ADMIN"], isDisabled: false }
