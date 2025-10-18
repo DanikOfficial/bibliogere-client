@@ -5,6 +5,7 @@ import obraReducer from '../features/obra/data/obraSlice'
 import estanteReducer from '../features/estantes/data/estanteSlice'
 import tipoEstanteReducer from '../features/tipoEstante/tipoEstanteSlice'
 import emprestimoReducer from "../features/emprestimo/data/emprestimoSlice"
+import { questaoReducer } from '../features/user/questaoSlice'
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     emprestimo: emprestimoReducer,
     estante: estanteReducer,
     tipoEstante: tipoEstanteReducer,
+    questoes: questaoReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),

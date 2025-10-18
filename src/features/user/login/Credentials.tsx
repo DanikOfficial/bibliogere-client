@@ -1,29 +1,18 @@
 import React, { useState, FC } from 'react'
-import { useAppDispatch } from '../../../app/hooks'
 import { useNavigate, Link } from 'react-router-dom'
 import { useLoginMutation } from '../../../app/services/userApi'
-import { setCredentials } from '../userSlice'
-import type { AuthState } from '../userSlice'
-import type { LoginRequest, ErrorState } from '../../../app/services/userApi'
 import Input from '../../../components/reusable/Input'
 import { getEntryPoint } from '../../../utils/entrypoint'
+import { defaultLoginErrorResponse, defaultLoginFormState, LoginErrorResponse, LoginRequest, LoginResponse } from '../data/userInterfaces'
+import { sendLoginRequest } from '../data/business.logic'
 
 const Credentials: FC = () => {
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const initialErrorState: ErrorState = {
-    error: false,
-    message: '',
-    errors: { username: '' },
-  }
 
-  const [formState, setFormState] = useState<LoginRequest>({
-    username: '',
-    password: '',
-  })
+  const [formState, setFormState] = useState<LoginRequest>(defaultLoginFormState)
 
-  const [error, setError] = useState<ErrorState>(initialErrorState)
+  const [error, setError] = useState<LoginErrorResponse>(defaultLoginErrorResponse)
 
   const [login, { isLoading, isError }] = useLoginMutation()
 
@@ -36,36 +25,12 @@ const Credentials: FC = () => {
 
   const handleLogin = async () => {
     if (canLogin) {
-      try {
-        setError(initialErrorState)
 
-        const { nome, token, permissoes } = await login(formState).unwrap()
-
-        dispatch(
-          setCredentials({
-            currentUser: nome,
-            token,
-            role: permissoes[0],
-          } as AuthState)
-        )
-
-        const entrypoint = getEntryPoint(permissoes[0].nome)
-        console.log('Entrypoint ', entrypoint)
-
-        if (entrypoint) {
-          navigate(entrypoint.url)
-        } else {
-          console.error('Invalid Role: ', permissoes[0].nome)
-          setError({
-            error: true,
-            message: 'Utilizador Invalido',
-            errors: { username: '' },
-          })
-        }
-      } catch (err) {
-        const data = err as ErrorState
-        setError((prev) => ({ ...prev, ...data }))
+      sendLoginRequest(formState, login, setError, (loginResponse: LoginResponse) => {
+        const entrypoint = getEntryPoint(loginResponse.permissoes[0].nome)
+        navigate(entrypoint.url)
       }
+      )
     }
   }
 
@@ -86,7 +51,7 @@ const Credentials: FC = () => {
               name="username"
               type="text"
               onChange={handleOnChange}
-              error={error.errors.username}
+              error={error.errors?.username}
               color="primary"
               placeholder="Nome do utilizador"
             />
@@ -100,6 +65,7 @@ const Credentials: FC = () => {
               label="Palavra-passe"
               name="password"
               type="password"
+              error={error.errors?.password}
               onChange={handleOnChange}
               color="primary"
               placeholder="Palavra-passe do utilizador"
@@ -146,3 +112,4 @@ const Credentials: FC = () => {
 }
 
 export default Credentials
+

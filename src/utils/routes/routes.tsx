@@ -13,6 +13,7 @@ import Unauthorized from '../../components/Unauthenticated'
 import GerarRelatoriosView from '../../features/relatorios/RelatoriosView'
 import RelatorioEmprestimoView from '../../features/relatorios/emprestimos/RelatorioEmprestimoView'
 import RelatorioObrasView from '../../features/relatorios/obras/RelatorioObrasView'
+import DefinicoesView from '../../features/definicoes/DefinicoesView'
 
 const routes: RouteObject[] = [
   {
@@ -65,6 +66,10 @@ const routes: RouteObject[] = [
             path: 'relatorios/obras',
             element: <RelatorioObrasView />,
           },
+          {
+            path: 'definicoes',
+            element: <DefinicoesView />
+          }
         ],
       },
     ],

@@ -219,35 +219,35 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                   <div className="col-lg-10">
                     {(formState.type.value as string).toLowerCase() ===
                       'livro' && (
-                      <ControlledInput
-                        id="editora"
-                        label="Editora"
-                        value={formState.editora ?? ''}
-                        color="secondary"
-                        name="editora"
-                        type="text"
-                        error={error.errors?.editora}
-                        onChange={(event) => onInputChange(event, setFormState)}
-                        reference={inputRef}
-                        placeholder="Editora do livro!"
-                      />
-                    )}
+                        <ControlledInput
+                          id="editora"
+                          label="Editora"
+                          value={formState.editora ?? ''}
+                          color="secondary"
+                          name="editora"
+                          type="text"
+                          error={error.errors?.editora}
+                          onChange={(event) => onInputChange(event, setFormState)}
+                          reference={inputRef}
+                          placeholder="Editora do livro!"
+                        />
+                      )}
 
                     {(formState.type.value as string).toLowerCase() ===
                       'monografia' && (
-                      <ControlledInput
-                        id="tutor"
-                        label="Tutor"
-                        value={formState.tutor ?? ''}
-                        color="secondary"
-                        name="tutor"
-                        type="text"
-                        error={error.errors?.tutor}
-                        onChange={(event) => onInputChange(event, setFormState)}
-                        reference={inputRef}
-                        placeholder="Tutor da Monografia!"
-                      />
-                    )}
+                        <ControlledInput
+                          id="tutor"
+                          label="Tutor"
+                          value={formState.tutor ?? ''}
+                          color="secondary"
+                          name="tutor"
+                          type="text"
+                          error={error.errors?.tutor}
+                          onChange={(event) => onInputChange(event, setFormState)}
+                          reference={inputRef}
+                          placeholder="Tutor da Monografia!"
+                        />
+                      )}
                   </div>
                 </div>
                 <div className="row">
@@ -304,7 +304,7 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                     />
                   </div>
                 </div>
-
+                <hr />
                 <div className="row">
                   <div className="col-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
                     <button
@@ -326,11 +326,10 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                       <span className="me-1">Confirmar</span>
 
                       <i
-                        className={`bi ${
-                          isLoading
-                            ? 'bi-arrow-clockwise rotate'
-                            : 'bi-save text-light'
-                        }`}
+                        className={`bi ${isLoading
+                          ? 'bi-arrow-clockwise rotate'
+                          : 'bi-save text-light'
+                          }`}
                       ></i>
                     </button>
                   </div>

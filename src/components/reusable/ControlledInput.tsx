@@ -43,9 +43,8 @@ let ControlledInput: React.FC<Props> = ({
         placeholder={placeholder}
         ref={reference}
         onChange={onChange}
-        className={`form-control shadow-none rounded-3 border-2 border-${
-          error ? 'danger' : `${color} ${ addSpace ? 'mb-2' : ""}`
-        }`}
+        className={`form-control shadow-none rounded-3 border-2 ${error ? 'border-danger' : `border-${color}`
+          } ${addSpace ? 'mb-2' : ''}`}
       />
       <div className="form-text text-danger">{error}</div>
     </>
