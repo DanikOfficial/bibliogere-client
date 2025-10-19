@@ -3,6 +3,7 @@ import Logger from '../../../utils/reusable/Logger'
 import { api } from '../../api/apiSlice'
 import {
   ObraForm,
+  ObraReportRequest,
   ObraRequest,
   ObraResponse,
   UpdateObraRequest,
@@ -127,7 +128,22 @@ const obraApi = api.injectEndpoints({
           dispatch(obrasAdded(data))
         }
       },
-    })
+    }),
+    getObrasRelatorio: build.query<ObraResponse[], ObraReportRequest>({
+      query: ({ inicio, fim }) =>
+        `/relatorios/obras?inicio=${inicio}&fim=${fim}`,
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled
+          if (data) {
+            console.log('Relatório de obras carregado com sucesso!')
+          }
+        } catch (err) {
+          console.error('Erro ao carregar relatório de obras:', err)
+        }
+      },
+    }),
+
   }),
 })
 
@@ -137,6 +153,8 @@ export const {
   useDeleteObraMutation,
   useGetObrasQuery,
   useGetObraQuery,
+  useLazyGetObrasRelatorioQuery,
 } = obraApi
+
 
 export default obraApi

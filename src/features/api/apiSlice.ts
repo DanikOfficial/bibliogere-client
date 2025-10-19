@@ -39,7 +39,7 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
         showErrorToast('Sessão expirada. Faça login novamente.')
         api.dispatch(signOut())
         setTimeout(() => {
-          window.location.href = '/login'
+          window.location.href = '/'
         }, 1000)
         break
       case 500:
