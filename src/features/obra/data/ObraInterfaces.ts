@@ -26,6 +26,12 @@ export interface ObraEntity {
   editora?: string
 }
 
+export interface ObraReportRequest {
+  inicio: string
+  fim: string
+}
+
+
 export interface ObraResponse extends ObraEntity {}
 
 export interface Obra {
