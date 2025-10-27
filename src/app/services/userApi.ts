@@ -1,8 +1,12 @@
 import { api } from '../../features/api/apiSlice'
 import { CreatePasswordRequest, UpdatePasswordRequest } from '../../features/definicoes/data/DefinicoesInterfaces'
 import { AtualizarQuestoesRequest, LoginRequest, LoginResponse, Questoes, ValidarQuestoesRequest, ValidarQuestoesResponse } from '../../features/user/data/userInterfaces'
+import { atendenteAdded, atendenteDeleted, atendenteEnabled, atendentesAdded } from '../../features/user/management/data/atendenteSlice'
+import { AtendenteRequest, AtendenteResponse } from '../../features/user/management/data/atendenteInterfaces'
 import { AuthState, setCredentials, setUserQuestoes } from '../../features/user/userSlice'
+import Logger from '../../utils/reusable/Logger'
 
+const logger = Logger.getInstance()
 
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -74,13 +78,76 @@ export const userApi = api.injectEndpoints({
         body: alterarQuestoesRequest
       }),
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-        const { data } = await queryFulfilled 
+        const { data } = await queryFulfilled
         if (data) {
           console.log("Questoes updated successfully: " + JSON.stringify(data))
           // Optionally, you can dispatch an action to update the state with new questoes
           dispatch(setUserQuestoes(data));
         } else {
           console.warn('Failed to update questoes')
+        }
+      }
+    }),
+    listAtendentes: build.query<AtendenteResponse[], void>({
+      query: () => ({
+        url: '/admin/utilizadores',
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+
+        if (data) {
+          console.log("Atendentes fetched successfully")
+          dispatch(atendentesAdded(data))
+        }
+      }
+    }),
+
+    createAtendente: build.mutation<AtendenteResponse, AtendenteRequest>({
+      query: (atendente: AtendenteRequest) => ({
+        url: "/admin/utilizadores",
+        method: "POST",
+        body: atendente
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+
+        if (data) {
+          logger.log('Create Atendente request successfully sent!')
+          dispatch(atendenteAdded(data))
+        } else {
+          logger.warn('Create Atendente Request could not be sent!')
+        }
+      }
+    }),
+
+    deleteAtendente: build.mutation<AtendenteResponse, number>({
+      query: (codigoAtendente: number) => ({
+        url: `/admin/utilizadores/${codigoAtendente}`,
+        method: "DELETE"
+      }),
+      onQueryStarted: async (__dirname, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+
+        if (data) {
+          logger.log('Delete Atendente request successfully sent!')
+          dispatch(atendenteDeleted(data.codigo))
+        } else {
+          logger.warn('Delete Atendente Request could not be sent!')
+        }
+      }
+    }),
+    disableAtendente: build.mutation<AtendenteResponse, number>({
+      query: (codigoAtendente: number) => ({
+        url: `/admin/utilizadores/disable/${codigoAtendente}`,
+        method: "POST"
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+        if (data) {
+          logger.log('Disable Atendente request successfully sent!')
+          dispatch(atendenteEnabled(data))
+        } else {
+          logger.warn('Disable Atendente Request could not be sent!')
         }
       }
     }),
@@ -94,5 +161,9 @@ export const {
   useAlterarSenhaMutation,
   useAtivarUtilizadorMutation,
   useValidarQuestoesMutation,
-  useSaveQuestoesMutation
+  useSaveQuestoesMutation,
+  useListAtendentesQuery,
+  useCreateAtendenteMutation,
+  useDeleteAtendenteMutation,
+  useDisableAtendenteMutation
 } = userApi

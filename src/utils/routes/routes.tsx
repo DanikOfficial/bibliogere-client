@@ -14,6 +14,7 @@ import GerarRelatoriosView from '../../features/relatorios/RelatoriosView'
 import RelatorioEmprestimoView from '../../features/relatorios/emprestimos/RelatorioEmprestimoView'
 import RelatorioObrasView from '../../features/relatorios/obras/RelatorioObrasView'
 import DefinicoesView from '../../features/definicoes/DefinicoesView'
+import UtilizadoresView from '../../features/user/management/UtilizadoresView'
 
 const routes: RouteObject[] = [
   {
@@ -31,6 +32,10 @@ const routes: RouteObject[] = [
           {
             path: 'obras',
             element: <Obras />,
+          },
+          {
+            path: 'utilizadores',
+            element: <UtilizadoresView />
           },
           {
             path: 'estantes',
