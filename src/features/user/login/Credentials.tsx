@@ -1,10 +1,15 @@
 import React, { useState, FC } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useLoginMutation } from '../../../app/services/userApi'
+import { useLoginMutation, userApi } from '../../../app/services/userApi'
 import Input from '../../../components/reusable/Input'
 import { getEntryPoint } from '../../../utils/entrypoint'
 import { defaultLoginErrorResponse, defaultLoginFormState, LoginErrorResponse, LoginRequest, LoginResponse } from '../data/userInterfaces'
 import { sendLoginRequest } from '../data/business.logic'
+import { store } from '../../../app/store'
+import localizacaoApi from '../../localizacoes/localizacaoApi'
+import { questaoApi } from '../../../app/services/questaoApi'
+import estanteApi from '../../estantes/data/estanteApi'
+import obraApi from '../../obra/data/obraApi'
 
 const Credentials: FC = () => {
   const navigate = useNavigate()
@@ -27,6 +32,25 @@ const Credentials: FC = () => {
     if (canLogin) {
 
       sendLoginRequest(formState, login, setError, (loginResponse: LoginResponse) => {
+        // Livros
+        store.dispatch(obraApi.endpoints.getObras.initiate())
+
+        // Questao
+        store.dispatch(questaoApi.endpoints.getQuestoes.initiate())
+
+        // We only need to load restricted data for admin users
+        if (loginResponse.permissoes[0].nome === 'ROLE_ADMIN') {
+
+          // Localizações
+          store.dispatch(localizacaoApi.endpoints.getLocalizacoes.initiate())
+
+          // Estantes
+          store.dispatch(estanteApi.endpoints.getEstantes.initiate())
+
+          // Atendentes
+          store.dispatch(userApi.endpoints.listAtendentes.initiate())
+        }
+
         const entrypoint = getEntryPoint(loginResponse.permissoes[0].nome)
         navigate(entrypoint.url)
       }

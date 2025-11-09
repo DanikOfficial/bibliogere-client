@@ -53,7 +53,7 @@ const estantesSlice = createSlice({
       state,
       { payload: estante }: PayloadAction<EstanteEntity>
     ) => {
-      logger.log(`Seaching for estante with codigo ${estante.codigo}`)
+      logger.log(`Searching for estante with codigo ${estante.codigo}`)
 
       let existingEstante = state.all.entities[estante.codigo]
 

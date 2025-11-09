@@ -21,5 +21,5 @@ const questaoSlice = createSlice({
 });
 
 export const { setQuestoes } = questaoSlice.actions;
-export const questaoReducer = questaoSlice.reducer;
+export default questaoSlice.reducer;
 export const selectAllQuestoes = (state: RootState) => state.questoes ?? [];
