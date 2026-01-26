@@ -7,7 +7,7 @@ interface ItemEmprestimoInterface {
 
 const EmprestimoRead = forwardRef<HTMLDivElement, ItemEmprestimoInterface>(
   ({ data }, ref) => {
-    const { utente, contacto, email, itens } = data;
+    const { utente, contacto, email, itens, multa } = data;
 
     const formatDate = (dateString: string) => {
       return new Date(dateString).toLocaleDateString('pt-PT', {
@@ -58,7 +58,7 @@ const EmprestimoRead = forwardRef<HTMLDivElement, ItemEmprestimoInterface>(
                   </h5>
                 </div>
                 <div className="row g-2">
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <div className="d-flex align-items-start gap-2">
                       <i className="bi bi-person text-muted mt-1"></i>
                       <div>
@@ -67,7 +67,7 @@ const EmprestimoRead = forwardRef<HTMLDivElement, ItemEmprestimoInterface>(
                       </div>
                     </div>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <div className="d-flex align-items-start gap-2">
                       <i className="bi bi-telephone text-muted mt-1"></i>
                       <div>
@@ -76,12 +76,23 @@ const EmprestimoRead = forwardRef<HTMLDivElement, ItemEmprestimoInterface>(
                       </div>
                     </div>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <div className="d-flex align-items-start gap-2">
                       <i className="bi bi-envelope text-muted mt-1"></i>
                       <div>
                         <small className="text-muted d-block" style={{ fontSize: "0.75rem" }}>Email</small>
                         <strong className="text-break" style={{ fontSize: "0.85rem" }}>{email}</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="d-flex align-items-start gap-2">
+                      <i className={`bi bi-cash-stack ${multa > 0 ? 'text-danger' : 'text-muted'} mt-1`}></i>
+                      <div>
+                        <small className="text-muted d-block" style={{ fontSize: "0.75rem" }}>Multa</small>
+                        <strong className={multa > 0 ? 'text-danger' : ''} style={{ fontSize: "0.85rem" }}>
+                          {multa.toFixed(2)} MT
+                        </strong>
                       </div>
                     </div>
                   </div>

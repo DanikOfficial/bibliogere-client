@@ -7,11 +7,12 @@ import { EmprestimoEntity } from '../../emprestimo/data/EmprestimoInterfaces'
 export interface EmprestimoReportProps {
   startDate: string
   endDate: string
-  emprestimos: EmprestimoEntity[]
+  emprestimos: EmprestimoEntity[],
+  situacao?: string
 }
 
 const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
-  ({ startDate, endDate, emprestimos }, ref) => {
+  ({ startDate, endDate, emprestimos, situacao }, ref) => {
     const getSituacaoColor = (situacao: string) => {
       const sit = situacao.toLowerCase()
       if (sit.includes('ativo') || sit.includes('activo')) return 'bg-success'
@@ -43,8 +44,36 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
         }
       }
 
+      // Filter emprestimos based on situacao prop
+      let filteredEmprestimos = emprestimos
+
+      if (situacao && situacao.trim()) {
+        const filterSituacao = situacao.toLowerCase()
+
+        filteredEmprestimos = emprestimos.map(emp => {
+          const filteredItens = emp.itens?.filter(item => {
+            const itemSituacao = item.situacao.toLowerCase()
+
+            if (filterSituacao.includes('activo')) {
+              return itemSituacao.includes('activo') || itemSituacao.includes('ativo')
+            } else if (filterSituacao.includes('expirado')) {
+              return itemSituacao.includes('expirado')
+            } else if (filterSituacao.includes('devolvido')) {
+              return itemSituacao.includes('devolvido')
+            }
+
+            return false
+          })
+
+          return {
+            ...emp,
+            itens: filteredItens
+          }
+        }).filter(emp => emp.itens && emp.itens.length > 0)
+      }
+
       // Sort emprestimos by utente name
-      const sortedEmprestimos = [...emprestimos].sort((a, b) =>
+      const sortedEmprestimos = [...filteredEmprestimos].sort((a, b) =>
         a.utente.localeCompare(b.utente)
       )
 
@@ -103,10 +132,10 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
         totalLivros,
         totalMonografias
       }
-    }, [emprestimos])
+    }, [emprestimos, situacao])
 
     // Empty state
-    if (!emprestimos || emprestimos.length === 0) {
+    if (!emprestimos || emprestimos.length === 0 || summary.sortedEmprestimos.length === 0) {
       return (
         <div ref={ref} className="container-fluid p-4" style={{ backgroundColor: '#ffffff', minHeight: '100vh', maxWidth: '1400px', margin: '0 auto' }}>
           <div className="card shadow-sm border-0" style={{ borderLeft: '6px solid #0549e9' }}>
@@ -128,7 +157,11 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
             <div className="card-body text-center py-5">
               <i className="bi bi-inbox text-muted" style={{ fontSize: '5rem', opacity: 0.3 }}></i>
               <h4 className="text-muted mt-4 mb-2">Nenhum Empréstimo Encontrado</h4>
-              <p className="text-muted mb-0">Não há empréstimos registrados para o período selecionado.</p>
+              <p className="text-muted mb-0">
+                {situacao
+                  ? `Não há empréstimos com situação "${situacao}" para o período selecionado.`
+                  : 'Não há empréstimos registrados para o período selecionado.'}
+              </p>
             </div>
           </div>
 
@@ -192,7 +225,10 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
             <div className="row align-items-center">
               <div className="col-md-8">
                 <h3 className="text-primary mb-1 fw-bold">Relatório de Empréstimos</h3>
-                <p className="text-muted mb-0 small">Sistema BiblioGere</p>
+                <p className="text-muted mb-0 small">
+                  Sistema BiblioGere
+                  {situacao && <span className="ms-2 badge bg-secondary">{situacao}</span>}
+                </p>
               </div>
               <div className="col-md-4 text-md-end">
                 <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>Período do Relatório</small>
@@ -279,7 +315,8 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
 
         {/* Summary Cards */}
         <div className="row g-2 mb-2 summary-cards">
-          <div className="col-md-3">
+          {/* Total Emprestimos - Always show */}
+          <div className={situacao ? "col-md-6" : "col-md-3"}>
             <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
               <div className="position-absolute top-0 start-0 w-100 h-100"
                 style={{ background: 'linear-gradient(135deg, #0549e9 0%, #0d6efd 100%)' }}></div>
@@ -301,71 +338,149 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
             </div>
           </div>
 
-          <div className="col-md-3">
-            <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
-              <div className="position-absolute top-0 start-0 w-100 h-100"
-                style={{ background: 'linear-gradient(135deg, #198754 0%, #20c997 100%)' }}></div>
-              <div className="card-body position-relative p-2">
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Ativos</p>
-                    <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalAtivos}</h3>
-                    <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
-                      <i className="bi bi-check-circle-fill me-1"></i>Em andamento
-                    </small>
-                  </div>
-                  <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
-                    style={{ width: '44px', height: '44px', minWidth: '44px' }}>
-                    <i className="bi bi-clock-history text-white" style={{ fontSize: '1.2rem' }}></i>
+          {/* Show only the filtered status card when situacao prop is present */}
+          {!situacao && (
+            <>
+              <div className="col-md-3">
+                <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                  <div className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{ background: 'linear-gradient(135deg, #198754 0%, #20c997 100%)' }}></div>
+                  <div className="card-body position-relative p-2">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Ativos</p>
+                        <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalAtivos}</h3>
+                        <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                          <i className="bi bi-check-circle-fill me-1"></i>Em andamento
+                        </small>
+                      </div>
+                      <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                        style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                        <i className="bi bi-clock-history text-white" style={{ fontSize: '1.2rem' }}></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="col-md-3">
-            <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
-              <div className="position-absolute top-0 start-0 w-100 h-100"
-                style={{ background: 'linear-gradient(135deg, #ffc107 0%, #ffca2c 100%)' }}></div>
-              <div className="card-body position-relative p-2">
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Devolvidos</p>
-                    <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalDevolvidos}</h3>
-                    <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
-                      <i className="bi bi-arrow-return-left me-1"></i>Concluídos
-                    </small>
-                  </div>
-                  <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
-                    style={{ width: '44px', height: '44px', minWidth: '44px' }}>
-                    <i className="bi bi-check2-square text-white" style={{ fontSize: '1.2rem' }}></i>
+              <div className="col-md-3">
+                <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                  <div className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{ background: 'linear-gradient(135deg, #ffc107 0%, #ffca2c 100%)' }}></div>
+                  <div className="card-body position-relative p-2">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Devolvidos</p>
+                        <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalDevolvidos}</h3>
+                        <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                          <i className="bi bi-arrow-return-left me-1"></i>Concluídos
+                        </small>
+                      </div>
+                      <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                        style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                        <i className="bi bi-check2-square text-white" style={{ fontSize: '1.2rem' }}></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="col-md-3">
-            <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
-              <div className="position-absolute top-0 start-0 w-100 h-100"
-                style={{ background: 'linear-gradient(135deg, #dc3545 0%, #e35d6a 100%)' }}></div>
-              <div className="card-body position-relative p-2">
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Expirados</p>
-                    <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalExpirados}</h3>
-                    <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
-                      <i className="bi bi-exclamation-triangle-fill me-1"></i>Necessita atenção
-                    </small>
+              <div className="col-md-3">
+                <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                  <div className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{ background: 'linear-gradient(135deg, #dc3545 0%, #e35d6a 100%)' }}></div>
+                  <div className="card-body position-relative p-2">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Expirados</p>
+                        <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalExpirados}</h3>
+                        <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                          <i className="bi bi-exclamation-triangle-fill me-1"></i>Necessita atenção
+                        </small>
+                      </div>
+                      <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                        style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                        <i className="bi bi-exclamation-circle text-white" style={{ fontSize: '1.2rem' }}></i>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
-                    style={{ width: '44px', height: '44px', minWidth: '44px' }}>
-                    <i className="bi bi-exclamation-circle text-white" style={{ fontSize: '1.2rem' }}></i>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Show specific status card when filtered */}
+          {situacao?.toLowerCase().includes('activo') && (
+            <div className="col-md-6">
+              <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                <div className="position-absolute top-0 start-0 w-100 h-100"
+                  style={{ background: 'linear-gradient(135deg, #198754 0%, #20c997 100%)' }}></div>
+                <div className="card-body position-relative p-2">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Ativos</p>
+                      <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalAtivos}</h3>
+                      <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                        <i className="bi bi-check-circle-fill me-1"></i>Em andamento
+                      </small>
+                    </div>
+                    <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                      <i className="bi bi-clock-history text-white" style={{ fontSize: '1.2rem' }}></i>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {situacao?.toLowerCase().includes('devolvido') && (
+            <div className="col-md-6">
+              <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                <div className="position-absolute top-0 start-0 w-100 h-100"
+                  style={{ background: 'linear-gradient(135deg, #ffc107 0%, #ffca2c 100%)' }}></div>
+                <div className="card-body position-relative p-2">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Devolvidos</p>
+                      <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalDevolvidos}</h3>
+                      <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                        <i className="bi bi-arrow-return-left me-1"></i>Concluídos
+                      </small>
+                    </div>
+                    <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                      <i className="bi bi-check2-square text-white" style={{ fontSize: '1.2rem' }}></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {situacao?.toLowerCase().includes('expirado') && (
+            <div className="col-md-6">
+              <div className="card shadow-sm h-100 border-0 position-relative overflow-hidden">
+                <div className="position-absolute top-0 start-0 w-100 h-100"
+                  style={{ background: 'linear-gradient(135deg, #dc3545 0%, #e35d6a 100%)' }}></div>
+                <div className="card-body position-relative p-2">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <p className="text-white mb-1 fw-semibold" style={{ fontSize: '0.7rem' }}>Expirados</p>
+                      <h3 className="text-white fw-bold mb-1" style={{ fontSize: '1.5rem' }}>{summary.totalExpirados}</h3>
+                      <small className="text-white opacity-75" style={{ fontSize: '0.65rem' }}>
+                        <i className="bi bi-exclamation-triangle-fill me-1"></i>Necessita atenção
+                      </small>
+                    </div>
+                    <div className="bg-white bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: '44px', height: '44px', minWidth: '44px' }}>
+                      <i className="bi bi-exclamation-circle text-white" style={{ fontSize: '1.2rem' }}></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tipo de Obra Cards */}
@@ -417,6 +532,7 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
                     <th style={{ fontSize: '0.7rem' }} className="text-uppercase fw-bold">Data Devolução</th>
                     <th style={{ fontSize: '0.7rem' }} className="text-center text-uppercase fw-bold">Situação</th>
                     <th style={{ fontSize: '0.7rem' }} className="text-uppercase fw-bold">Obra</th>
+                    <th style={{ fontSize: '0.7rem' }} className="text-center text-uppercase fw-bold">Multa</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -443,6 +559,11 @@ const EmprestimoReport = forwardRef<HTMLDivElement, EmprestimoReportProps>(
                         <td className="align-middle">
                           <div className="fw-bold" style={{ fontSize: '0.8rem' }}>{item.obra.titulo}</div>
                           <small className="text-muted" style={{ fontSize: '0.7rem' }}>{item.obra.tipoObra}</small>
+                        </td>
+                        <td className="text-center align-middle">
+                          <span className={`fw-bold ${emprestimo.multa > 0 ? 'text-danger' : 'text-muted'}`} style={{ fontSize: '0.75rem' }}>
+                            {emprestimo.multa.toFixed(2)} MT
+                          </span>
                         </td>
                       </tr>
                     ))

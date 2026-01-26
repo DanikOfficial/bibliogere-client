@@ -11,13 +11,13 @@ const RelatorioEmprestimoView = () => {
     content: () => emprestimoRef.current,
   })
 
-  const { emprestimos, startDate, endDate } = location.state || {};
+  const { emprestimos, startDate, endDate, situacao } = location.state || {};
 
 
   return (
     <section id="definicoes" className="col pt-2 ms-4 position-relative">
       <div id="actions" className="d-flex flex-wrap mb-2 ms-4">
-        <EmprestimoReport emprestimos={emprestimos} startDate={startDate} endDate={endDate} ref={emprestimoRef} />
+        <EmprestimoReport emprestimos={emprestimos} startDate={startDate} endDate={endDate} ref={emprestimoRef} situacao={situacao.value} />
       </div>
 
       {emprestimos && emprestimos.length > 0 && <button
