@@ -9,12 +9,21 @@ const Estantes: FC = () => {
 
   return (
     <>
-      <SectionName>Gestão de Estantes</SectionName>
-      <NovaEstante />
-      {isSearchEnabled && <SearchEstante />}
-      <hr />
-      <EstanteList />
+      <section id="estantes-view" className="col pt-3 px-3">
+        <SectionName
+          align="center"
+          withIcon="bi-bookshelf"
+          subtitle="Gerencie as estantes da biblioteca"
+        >
+          Gestão de Estantes
+        </SectionName>
+        <NovaEstante />
+        {isSearchEnabled && <SearchEstante />}
+        <hr />
+        <EstanteList />
+      </section>
     </>
+
   )
 }
 

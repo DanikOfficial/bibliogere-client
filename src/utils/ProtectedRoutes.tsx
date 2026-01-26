@@ -11,28 +11,33 @@ const ProtectedRoutes: React.FC = () => {
 
   // Get the current path
   const currentPath = location.pathname.replace('/dashboard/', '')
+  console.log("Stripped path:", currentPath);
 
   // Get allowed routes for the user
   const allowedRoutes = linksArr.filter((link) =>
-    link.roles.includes(role.nome)
+    link.roles.includes(role?.nome || '')
   )
 
-  let isAuthorized = allowedRoutes.some((link) => link.path === currentPath)
+  console.log("Allowed routes for role:", allowedRoutes);
 
-  // Regex for matching paths like /emprestions/{number}
+  let isAuthorized = allowedRoutes.some((link) => link.path === currentPath)
+  console.log("Is authorized?", isAuthorized);
+
+  // Regex for matching paths like /emprestimos/{number}
   const regex = /^emprestimos\/\d+$/
 
-  // Check if the path matches the emprestions/{number} pattern
+  // Check if the path matches the emprestimos/{number} pattern
   if (!isAuthorized && regex.test(currentPath)) {
     isAuthorized = true
+    console.log("Matched emprestimos regex pattern");
   }
 
   if (!logged) {
-    return <Unauthorized /> // Redirect unauthenticated users
+    return <Unauthorized />
   }
 
   if (!isAuthorized) {
-    return <Navigate to="/unauthorized" replace /> // Redirect unauthorized users
+    return <Navigate to="/unauthorized" replace />
   }
 
   return <Outlet />

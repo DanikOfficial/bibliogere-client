@@ -1,4 +1,4 @@
-import { api } from '../../api/apiSlice'
+import { api } from '../../api/baseApi'
 
 import {
   estanteAdded,

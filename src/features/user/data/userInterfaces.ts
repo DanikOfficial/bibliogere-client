@@ -40,7 +40,7 @@ export interface LoginResponse {
   questoes: Questoes,
   token: string;
   isActive: boolean;
-  isFirstLogin: boolean;  
+  firstLogin: boolean;
 }
 
 export interface UserQuestoesResponse {
@@ -69,10 +69,44 @@ export interface Questoes {
   segundaQuestao: string
 }
 
-export interface ValidarQuestoesRequest extends Questoes {
-  codigoUtilizador: number,
+export interface BaseValidarQuestoesRequest extends Questoes {
   primeiraResposta: string,
   segundaResposta: string
+}
+
+export interface ValidarQuestoesFromRecoveryRequest extends BaseValidarQuestoesRequest {
+  username: string,
+}
+
+export const defaultValidarQuestoesFromRecoveryRequest: ValidarQuestoesFromRecoveryRequest = {
+  username: "",
+  primeiraQuestao: "",
+  segundaQuestao: "",
+  primeiraResposta: "",
+  segundaResposta: ""
+}
+
+export interface ValidarQuestoesFromRecoveryErrorResponse extends ApiError<ValidarQuestoesFromRecoveryRequest> {
+  firstQuestionValid: Boolean,
+  secondQuestionValid: Boolean,
+}
+
+export const defaultValidarQuestoesFromRecoveryErrorResponse: ValidarQuestoesFromRecoveryErrorResponse = {
+  message: "",
+  firstQuestionValid: true,
+  secondQuestionValid: true,
+  error: false,
+  errors: {
+    primeiraQuestao: "",
+    segundaQuestao: "",
+    primeiraResposta: "",
+    segundaResposta: "",
+    username: ""
+  },
+}
+
+export interface ValidarQuestoesRequest extends BaseValidarQuestoesRequest {
+  codigoUtilizador: number,
 }
 
 export interface ValidarQuestoesResponse {

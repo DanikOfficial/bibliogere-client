@@ -60,15 +60,34 @@ const SearchSection: React.FC = () => {
   }, [tipoObra])
 
   return (
-    <section id="search-section" className="row mx-0">
-      <div
-        id="search-fields"
-        className="rounded bg-white py-2 px-3 mb-2 col-lg-11 border-2"
-      >
-        <h5 className="text-center text-prevent my-2">Pesquisar Obra</h5>
-        <div className="row mb-4">
-          <div className="rounded bg-white py-2 px-3 mb-2">
-            {/*
+    <section id="search-section" className="mb-4">
+      <div className="card border-0 shadow-sm" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+        {/* Card Header */}
+        <div 
+          className="card-header border-0 py-3 px-4"
+          style={{ 
+            background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'
+          }}
+        >
+          <div className="d-flex align-items-center text-white">
+            <div 
+              className="d-flex align-items-center justify-content-center rounded-circle bg-white me-3"
+              style={{ width: '48px', height: '48px' }}
+            >
+              <i className="bi bi-search" style={{ color: '#2563eb', fontSize: '1.5rem' }}></i>
+            </div>
+            <div>
+              <h5 className="mb-0 fw-bold">Pesquisar Obra</h5>
+              <small style={{ fontSize: '0.85rem', opacity: 0.9 }}>
+                Encontre obras por título no catálogo
+              </small>
+            </div>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div className="card-body p-4">
+          {/*
             
             FIXME: fix this
 
@@ -80,29 +99,53 @@ const SearchSection: React.FC = () => {
               onChange={onChangeTipoObraSelect}
               options={tipoObraOptions}
             /> */}
-            <div className="row">
-              <div className="col-lg-10 mb-2">
-                <ControlledInput
-                  name="titulo"
-                  color="secondary"
-                  id="titulo"
-                  value={titulo}
-                  onChange={(event) => onChangeTitulo(event, setTitulo)}
-                  type="text"
-                  placeholder="Digite o titulo da obra!"
-                />
-              </div>
-              <div className="col-lg-2 d-flex">
-                <button
-                  disabled={!Boolean(titulo)}
-                  onClick={onClickPesquisar}
-                  className="btn btn-primary d-flex align-items-center"
-                >
-                  <span>Pesquisar</span> <i className="bi bi-search ms-2"></i>
-                </button>
-              </div>
+          
+          <div className="row g-3 align-items-end">
+            <div className="col-lg-9">
+              <label className="form-label fw-semibold text-secondary mb-2">
+                <i className="bi bi-book me-2"></i>Título da Obra
+              </label>
+              <ControlledInput
+                name="titulo"
+                color="secondary"
+                id="titulo"
+                value={titulo}
+                onChange={(event) => onChangeTitulo(event, setTitulo)}
+                type="text"
+                placeholder="Digite o título da obra que procura..."
+              />
+            </div>
+            <div className="col-lg-3">
+              <button
+                disabled={!Boolean(titulo)}
+                onClick={onClickPesquisar}
+                className="btn btn-primary w-100 search-btn d-flex align-items-center justify-content-center gap-2 position-relative overflow-hidden"
+                style={{
+                  padding: '0.65rem 1rem',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 4px rgba(37, 99, 235, 0.2)'
+                }}
+              >
+                <span className="position-relative z-1 d-flex align-items-center gap-2">
+                  <i className="bi bi-search"></i>
+                  <span>Pesquisar</span>
+                </span>
+                <div className="btn-shine position-absolute top-0 start-0 w-100 h-100"></div>
+              </button>
             </div>
           </div>
+
+          {!titulo && (
+            <div className="alert alert-info d-flex align-items-center mt-3 mb-0" style={{ borderRadius: '10px' }}>
+              <i className="bi bi-lightbulb-fill me-2"></i>
+              <small>Dica: Digite pelo menos parte do título para iniciar a pesquisa</small>
+            </div>
+          )}
         </div>
 
         {/*
@@ -124,11 +167,18 @@ const SearchSection: React.FC = () => {
             ></i>
           </p>
         </div> */}
+
+        {/* Advanced Search Fields (Hidden by default) */}
         <div
           id="advanced-search-fields"
-          className={`d-${isAdvanced ? 'block' : 'none'}`}
+          className={`${isAdvanced ? 'd-block' : 'd-none'} border-top pt-4 px-4 pb-3`}
         >
-          <div className="row mb-2">
+          <h6 className="text-primary fw-bold mb-3">
+            <i className="bi bi-funnel me-2"></i>
+            Pesquisa Avançada
+          </h6>
+          
+          <div className="row g-3 mb-3">
             <div className="col-lg-8">
               <ControlledInput
                 name="autor"
@@ -146,8 +196,9 @@ const SearchSection: React.FC = () => {
               />
             </div>
           </div>
-          <div className="row">
-            <div className="col-md-6 col-lg-3 col-xl-4 mb-2 mb-md-0">
+          
+          <div className="row g-3">
+            <div className="col-md-6 col-lg-3 col-xl-4">
               <ControlledInput
                 name="ano"
                 id="anoSearch"
@@ -193,6 +244,61 @@ const SearchSection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .search-btn {
+          letter-spacing: 0.3px;
+        }
+
+        .search-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        .search-btn:active:not(:disabled) {
+          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+        }
+
+        .search-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: #94a3b8 !important;
+        }
+
+        .btn-shine {
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%
+          );
+          transform: translateX(-100%);
+          transition: transform 0.6s ease;
+          pointer-events: none;
+        }
+
+        .search-btn:hover:not(:disabled) .btn-shine {
+          transform: translateX(100%);
+        }
+
+        .search-btn:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        .z-1 {
+          z-index: 1;
+        }
+
+        .card {
+          transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+        }
+      `}</style>
     </section>
   )
 }

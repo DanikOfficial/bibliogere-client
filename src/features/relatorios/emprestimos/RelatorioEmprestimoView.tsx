@@ -1,23 +1,28 @@
 import { useRef } from 'react'
 import EmprestimoReport from './EmprestimoReport'
 import { useReactToPrint } from 'react-to-print'
+import { useLocation } from 'react-router-dom'
 
 const RelatorioEmprestimoView = () => {
   const emprestimoRef = useRef<HTMLDivElement>(null)
+  const location = useLocation();
 
   const handlePrint = useReactToPrint({
-    contentRef: emprestimoRef,
+    content: () => emprestimoRef.current,
   })
+
+  const { emprestimos, startDate, endDate } = location.state || {};
+
 
   return (
     <section id="definicoes" className="col pt-2 ms-4 position-relative">
       <div id="actions" className="d-flex flex-wrap mb-2 ms-4">
-        <EmprestimoReport ref={emprestimoRef} />
+        <EmprestimoReport emprestimos={emprestimos} startDate={startDate} endDate={endDate} ref={emprestimoRef} />
       </div>
 
-      <button
+      {emprestimos && emprestimos.length > 0 && <button
         className="btn btn-primary d-flex align-items-center justify-content-center position-fixed bottom-0 end-0 m-3 shadow-lg"
-        onClick={() => handlePrint()}
+        onClick={handlePrint}
         style={{
           width: '50px',
           height: '50px',
@@ -27,7 +32,7 @@ const RelatorioEmprestimoView = () => {
         }}
       >
         <i className="bi bi-printer-fill" style={{ fontSize: '24px' }}></i>
-      </button>
+      </button>}
     </section>
   )
 }

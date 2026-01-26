@@ -1,6 +1,6 @@
-import { api } from "../../api/apiSlice";
+import { api } from "../../api/baseApi";
 import Logger from "../../../utils/reusable/Logger";
-import { CreateEmprestimoRequest, CreateEmprestimoResponse, EmprestimoEntity } from "./EmprestimoInterfaces";
+import { CreateEmprestimoRequest, CreateEmprestimoResponse, EmprestimoEntity, GenerateEmprestimoRequest } from "./EmprestimoInterfaces";
 import { emprestimoAdded, emprestimoDeleted, emprestimosAdded, emprestimoSelected } from "./emprestimoSlice";
 
 const logger = Logger.getInstance()
@@ -15,9 +15,6 @@ const emprestimoApi = api.injectEndpoints({
             }),
             onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
                 const { data } = await queryFulfilled
-
-                console.log("Created Obra")
-
                 if (data) {
                     logger.log("Create Emprestimo Successfully executed")
                     dispatch(emprestimoAdded(data))
@@ -63,10 +60,18 @@ const emprestimoApi = api.injectEndpoints({
                     dispatch(emprestimoDeleted(data.codigo))
                 }
             }
-        })
-    })
+        }),
+        generateEmprestimo: build.mutation<EmprestimoEntity[], GenerateEmprestimoRequest>({
+            query: (generateEmprestimoRequest: GenerateEmprestimoRequest) => ({
+                url: `/admin/emprestimos/relatorio`,
+                body: generateEmprestimoRequest,
+                method: "POST"
+            })
+        }),
+    }),
+
 })
 
-export const { useCreateEmprestimoMutation, useDevolverEmprestimoMutation, useGetEmprestimoByCodigoQuery } = emprestimoApi
+export const { useCreateEmprestimoMutation, useDevolverEmprestimoMutation, useGetEmprestimoByCodigoQuery, useGenerateEmprestimoMutation } = emprestimoApi
 
 export default emprestimoApi

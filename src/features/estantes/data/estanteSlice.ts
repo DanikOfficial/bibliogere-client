@@ -25,8 +25,8 @@ const comparer = (
   return 0
 }
 
-const estantesAdapter: EntityAdapter<EstanteEntity> =
-  createEntityAdapter<EstanteEntity>({
+const estantesAdapter: EntityAdapter<EstanteEntity, number> =
+  createEntityAdapter<EstanteEntity, number>({
     selectId: (estante) => estante.codigo,
     sortComparer: comparer,
   })
@@ -54,38 +54,22 @@ const estantesSlice = createSlice({
       { payload: estante }: PayloadAction<EstanteEntity>
     ) => {
       logger.log(`Searching for estante with codigo ${estante.codigo}`)
-
-      let existingEstante = state.all.entities[estante.codigo]
-
-      if (existingEstante) {
-        logger.log('Estante found!')
-        const { nome, tipoEstante } = estante
-
-        logger.log(
-          `Updating estante with codigo ${estante.codigo} with data ${estante}`
-        )
-        existingEstante.nome = nome
-        existingEstante.tipoEstante = tipoEstante
-      } else {
-        logger.warn('Estante not found in the adapter, Ignoring update!')
-      }
+      estantesAdapter.updateOne(state.all, {
+        id: estante.codigo,
+        changes: {
+          nome: estante.nome,
+          tipoEstante: estante.tipoEstante
+        }
+      })
     },
     estanteDeleted: (
       state,
       { payload: estanteCodigo }: PayloadAction<number>
     ) => {
       logger.log(
-        `Attemping to Deleting estante with the id of ${estanteCodigo} from the estanteAdapter`
+        `Attempting to delete estante with the id of ${estanteCodigo} from the estanteAdapter`
       )
-
-      const existingEstante = state.all.entities[estanteCodigo]
-
-      if (existingEstante) {
-        logger.log('Found! Deleting')
-        estantesAdapter.removeOne(state.all, estanteCodigo)
-      } else {
-        logger.warn('Could not find estante in the Adapter. Ignoring Deletion!')
-      }
+      estantesAdapter.removeOne(state.all, estanteCodigo)
     },
     estantesAdded: (
       state,
@@ -98,7 +82,7 @@ const estantesSlice = createSlice({
       state,
       { payload: estante }: PayloadAction<EstanteForm>
     ) => {
-      logger.log(`Setting ${estante} as selected`)
+      logger.log(`Setting ${JSON.stringify(estante)} as selected`)
       state.selectedEntity = estante
       state.isUpdating = true
     },
@@ -121,7 +105,7 @@ export const {
 
 export const { selectAll: selectAllEstantes, selectById: selectEstanteById } =
   estantesAdapter.getSelectors(
-    (state: RootState) => state.estante.all ?? estantesAdapter.getInitialState()
+    (state: RootState) => state.estante.all
   )
 
 export const selectCurrentEstante = (state: RootState) =>
@@ -143,3 +127,4 @@ export const selectEstantesByTipoEstante = createSelector(
 )
 
 export default estantesSlice.reducer
+

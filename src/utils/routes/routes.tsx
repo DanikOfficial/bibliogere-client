@@ -5,7 +5,7 @@ import type { RouteObject } from 'react-router-dom'
 import Hero from '../../components/hero/Hero'
 import Obras from '../../features/obra/Obras'
 import Estantes from '../../features/estantes/Estantes'
-import { EmprestimosView } from '../../features/emprestimo/EmprestimosView'
+import EmprestimosView from '../../features/emprestimo/EmprestimosView'
 import CreateEmprestimo from '../../features/emprestimo/CreateEmprestimo'
 import EmprestimosEntrypoint from '../../features/emprestimo/EmprestimosEntrypoint'
 import EmprestimoView from '../../features/emprestimo/EmprestimoView'
@@ -15,6 +15,12 @@ import RelatorioEmprestimoView from '../../features/relatorios/emprestimos/Relat
 import RelatorioObrasView from '../../features/relatorios/obras/RelatorioObrasView'
 import DefinicoesView from '../../features/definicoes/DefinicoesView'
 import UtilizadoresView from '../../features/user/management/UtilizadoresView'
+import RecoverUserWrapper from '../../features/user/recovery/RecoveryUserWrapper'
+import ActivateUserWrapper from '../../features/user/activation/ActivateUserWrapper'
+import UsernameStep from '../../features/user/recovery/UsernameStep'
+import ValidateQuestoes from '@/features/user/common/ValidateQuestoes'
+import CreatePassword from '@/features/user/common/CreatePassword'
+import CreateQuestoes from '@/features/user/common/CreateQuestoes'
 
 const routes: RouteObject[] = [
   {
@@ -54,8 +60,8 @@ const routes: RouteObject[] = [
                 element: <EmprestimosView />,
               },
               {
-                path: ':codigo', // Dynamic route for EmprestimoView
-                element: <EmprestimoView />, // This is the component that will be rendered
+                path: ':codigo',
+                element: <EmprestimoView />,
               },
             ],
           },
@@ -82,6 +88,23 @@ const routes: RouteObject[] = [
   {
     path: '/unauthorized',
     element: <Unauthorized />,
+  },
+  {
+    path: 'recovery',
+    element: <RecoverUserWrapper />,
+    children: [
+      { path: 'validar-utilizador', element: <UsernameStep /> },
+      { path: 'validar-questoes', element: <ValidateQuestoes /> },
+      { path: 'criar-senha', element: <CreatePassword /> }
+    ],
+  },
+  {
+    path: 'activate',
+    element: <ActivateUserWrapper />,
+    children: [
+      { path: 'criar-questoes', element: <CreateQuestoes /> },
+      { path: 'criar-senha', element: <CreatePassword /> }
+    ]
   },
 ]
 

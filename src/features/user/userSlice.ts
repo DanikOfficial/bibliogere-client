@@ -2,9 +2,8 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
 import { Questoes } from './data/userInterfaces'
 
-
 export interface AuthState {
-  codigo?: number,
+  codigo?: number
   currentUser: string
   token: string
   loggedIn: boolean
@@ -13,9 +12,8 @@ export interface AuthState {
   role: {
     codigo: number
     nome: string
-  },
+  }
   questoes: Questoes
-
 }
 
 const loadAuthState = (): AuthState => {
@@ -43,24 +41,21 @@ const userSlice = createSlice({
   name: 'user',
   initialState: loadAuthState(),
   reducers: {
-    setCredentials: (
-      state,
-      { payload: { currentUser, token, role, codigo, questoes } }: PayloadAction<AuthState>
-    ) => {
-      state.currentUser = currentUser
-      state.token = token
-      state.role = role
-      state.loggedIn = true
-      state.codigo = codigo
-      state.questoes = questoes
+    setCredentials: (state, action: PayloadAction<AuthState>) => {
+      // Assign all fields from payload
+      state.codigo = action.payload.codigo
+      state.currentUser = action.payload.currentUser
+      state.token = action.payload.token
+      state.role = action.payload.role
+      state.loggedIn = true // Always set to true when credentials are provided
+      state.questoes = action.payload.questoes
+      state.isActive = action.payload.isActive
+      state.isFirstLogin = action.payload.isFirstLogin
 
       // Save to sessionStorage
       sessionStorage.setItem("authState", JSON.stringify(state))
     },
-    setUserQuestoes: (
-      state,
-      { payload }: PayloadAction<Questoes>
-    ) => {
+    setUserQuestoes: (state, { payload }: PayloadAction<Questoes>) => {
       state.questoes = payload
 
       // Update sessionStorage
@@ -69,9 +64,12 @@ const userSlice = createSlice({
     signOut: (state) => {
       state.currentUser = ''
       state.token = ''
-      state.role.codigo = -1
-      state.role.nome = ""
+      state.role = { codigo: -1, nome: "" }
       state.loggedIn = false
+      state.isActive = false
+      state.isFirstLogin = false
+      state.codigo = undefined
+      state.questoes = { primeiraQuestao: "", segundaQuestao: "" }
 
       // Remove from sessionStorage
       sessionStorage.removeItem("authState")
@@ -83,26 +81,13 @@ export const { setCredentials, signOut, setUserQuestoes } = userSlice.actions
 
 export default userSlice.reducer
 
-export const selectCurrentUser = createSelector(
-  (state: RootState) => state.user,
-  (authState) => authState.currentUser
-)
+// Simple selectors - no need for createSelector when just accessing properties
+export const selectCurrentUser = (state: RootState) => state.user.currentUser
 
-export const selectQuestoes = createSelector((state: RootState) => state.user,
-  (authState) => authState.questoes
-)
+export const selectQuestoes = (state: RootState) => state.user.questoes
 
-export const selectCurrentUserData = createSelector(
-  (state: RootState) => state.user,
-  (authState) => authState
-)
+export const selectCurrentUserData = (state: RootState) => state.user
 
-export const isLoggedIn = createSelector(
-  (state: RootState) => state.user,
-  (authState) => authState.loggedIn
-)
+export const isLoggedIn = (state: RootState) => state.user.loggedIn
 
-export const selectRole = createSelector(
-  (state: RootState) => state.user,
-  (authState) => authState.role
-)
+export const selectRole = (state: RootState) => state.user.role

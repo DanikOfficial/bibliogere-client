@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast'
 import Logger from '../../../utils/reusable/Logger'
-import { api } from '../../api/apiSlice'
+import { api } from '../../api/baseApi'
 import {
   ObraForm,
   ObraReportRequest,
@@ -131,7 +131,7 @@ const obraApi = api.injectEndpoints({
     }),
     getObrasRelatorio: build.query<ObraResponse[], ObraReportRequest>({
       query: ({ inicio, fim }) =>
-        `/relatorios/obras?inicio=${inicio}&fim=${fim}`,
+        `/admin/obras/relatorio?inicio=${inicio}&fim=${fim}`,
       onQueryStarted: async (_, { queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled
@@ -153,7 +153,8 @@ export const {
   useDeleteObraMutation,
   useGetObrasQuery,
   useGetObraQuery,
-  useLazyGetObrasRelatorioQuery,
+  useGetObrasRelatorioQuery,
+  useFindObrasQuery
 } = obraApi
 
 

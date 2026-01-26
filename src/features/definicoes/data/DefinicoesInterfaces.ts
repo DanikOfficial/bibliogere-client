@@ -1,11 +1,13 @@
-export interface CreatePasswordRequest {
-    codigoUtilizador: number;
-    newPassword: string;
-    confirmPassword: string;
+import { ApiError } from "@/components/reusable/data/CommonInterfaces";
+
+export interface BasePasswordRequest {
+  newPassword: string;
+  confirmPassword: string;
 }
 
-export interface UpdatePasswordRequest extends CreatePasswordRequest {
-   oldPassword: string
+export interface UpdatePasswordRequest extends BasePasswordRequest {
+  oldPassword: string,
+  codigoUtilizador: number
 }
 
 export interface UpdatePasswordErrorResponse {
@@ -25,11 +27,32 @@ export const defaultUpdatePasswordRequest: UpdatePasswordRequest = {
   confirmPassword: ""
 }
 
-export const defaultCreatePasswordRequest: CreatePasswordRequest = {
-  codigoUtilizador: 0,
-  newPassword: "",
-  confirmPassword: ""
+export interface CreatePasswordRequest extends BasePasswordRequest {
+  username: string,
 }
+
+export interface CreatePasswordErrorResponse extends ApiError<CreatePasswordRequest> { }
+
+export const defaultCreatePasswordErrorResponse: CreatePasswordErrorResponse = {
+  error: false,
+  message: "",
+  errors: {
+    confirmPassword: "",
+    newPassword: "",
+    username: ""
+  }
+}
+
+export const defaultCreatePasswordRequest: CreatePasswordRequest = {
+  newPassword: "",
+  confirmPassword: "",
+  username: ""
+}
+
+export interface CreatePasswordState {
+  username: string
+}
+
 
 export const defaultUpdatePasswordErrorResponse: UpdatePasswordErrorResponse = {
   error: false,

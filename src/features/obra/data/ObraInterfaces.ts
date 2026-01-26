@@ -24,15 +24,17 @@ export interface ObraEntity {
   tipoObra: string
   tutor?: string
   editora?: string
+  quantidadeInicial: number
 }
 
 export interface ObraReportRequest {
   inicio: string
   fim: string
+  estante?: string
 }
 
 
-export interface ObraResponse extends ObraEntity {}
+export interface ObraResponse extends ObraEntity { }
 
 export interface Obra {
   [key: string]: string | number | undefined
