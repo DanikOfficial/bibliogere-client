@@ -117,9 +117,6 @@ const NovaEstante: React.FC = () => {
         setError,
         dispatch,
         (isUpdated) => {
-
-          console.log("Is Updated? ", isUpdated)
-
           if (isUpdated) {
             setIsUpdateEstanteRequestSuccess(isUpdated)
             setIsError(false)

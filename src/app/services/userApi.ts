@@ -63,8 +63,6 @@ export const userApi = api.injectEndpoints({
           const { data } = await queryFulfilled
 
           if (data) {
-            console.log("CreatePassword Response:", JSON.stringify(data))
-
             const { codigo, username, nome, token, permissoes, questoes, isActive, firstLogin } = data
 
             const authState: AuthState = {
@@ -97,7 +95,6 @@ export const userApi = api.injectEndpoints({
         const { data } = await queryFulfilled
 
         if (data) {
-          console.log("Login Response: " + JSON.stringify(data))
           const { codigo, nome, token, permissoes, questoes, isActive, firstLogin: isFirstLogin } = data
 
           const authState: AuthState = {
@@ -110,10 +107,6 @@ export const userApi = api.injectEndpoints({
             isActive,
             isFirstLogin
           }
-
-
-          console.log("AuthState being dispatched:", authState) // Add this
-          console.log("Questoes in authState:", authState.questoes) // Add this
 
 
           dispatch(setCredentials(authState))
@@ -152,8 +145,6 @@ export const userApi = api.injectEndpoints({
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         const { data } = await queryFulfilled
         if (data) {
-          console.log("Questoes updated successfully: " + JSON.stringify(data))
-          // Optionally, you can dispatch an action to update the state with new questoes
           dispatch(setUserQuestoes(data));
         } else {
           console.warn('Failed to update questoes')

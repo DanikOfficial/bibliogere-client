@@ -30,7 +30,6 @@ const CreateEmprestimoRelatorioModal: FC<CreateEmprestimoRelatorioModalInterface
 
     sendGenerateEmprestimoRelatorioRequest(generateEmprestimoRequest, generateEmprestimo, (data) => {
       if (data) {
-        console.log('Relatório gerado com sucesso:', data)
         navigate('/dashboard/relatorios/emprestimos', {
           state: {
             dataInicio: formState.dataInicio,

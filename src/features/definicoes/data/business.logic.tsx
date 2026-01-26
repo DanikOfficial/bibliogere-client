@@ -26,7 +26,7 @@ export const sendUpdatePasswordRequeet = async (
 
 /**
  * Sends a request to validate questões (questions) and handles the response or errors.
- * 
+ *
  * @param validarQuestoesRequest - The request payload containing the questions to be validated
  * @param validarQuestoes - The API function/mutation hook that performs the validation request
  * @param setUiError - State setter function to update UI error state when validation fails
@@ -49,7 +49,6 @@ export const sendValidarQuestoesRequest = async (
     const response: ValidarQuestoesResponse = await validarQuestoes(validarQuestoesRequest).unwrap()
     onValidarQuestoesSuccess(response)
 
-    console.log("Validar Questoes Response: ", response)
   } catch (wrappedError: unknown) {
     const error = wrappedError as ErrorResponse<ValidarQuestoesErrorResponse>
     handleErrorResponse<ErrorResponse<ValidarQuestoesErrorResponse>, ValidarQuestoesErrorResponse>(error, setUiError)
@@ -70,5 +69,3 @@ export const sendUpdateQuestoesRequest = async (
     handleErrorResponse(error as ErrorResponse<AlterarQuestoesErroResponse>, setUiError);
   }
 }
-
-

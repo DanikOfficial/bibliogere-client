@@ -11,7 +11,7 @@ const comparer = (
   return 0
 }
 
-const tipoEstanteAdapter = createEntityAdapter<TipoEstante>({
+const tipoEstanteAdapter = createEntityAdapter<TipoEstante, number>({
   selectId: (tipoEstante) => tipoEstante.codigo,
   sortComparer: (firstTipoEstante, secondTipoEstante) =>
     comparer(firstTipoEstante, secondTipoEstante),

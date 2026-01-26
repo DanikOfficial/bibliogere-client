@@ -129,21 +129,22 @@ const obraApi = api.injectEndpoints({
         }
       },
     }),
-    getObrasRelatorio: build.query<ObraResponse[], ObraReportRequest>({
-      query: ({ inicio, fim }) =>
-        `/admin/obras/relatorio?inicio=${inicio}&fim=${fim}`,
+    generateObraRelatorio: build.mutation<ObraResponse[], ObraReportRequest>({
+      query: (reportRequest) => ({
+        url: `/admin/obras/relatorio`,
+        method: 'POST',
+        body: reportRequest,
+      }),
       onQueryStarted: async (_, { queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled
           if (data) {
-            console.log('Relatório de obras carregado com sucesso!')
+            logger.log('Relatório de obras gerado com sucesso!')
           }
         } catch (err) {
-          console.error('Erro ao carregar relatório de obras:', err)
         }
       },
     }),
-
   }),
 })
 
@@ -153,9 +154,8 @@ export const {
   useDeleteObraMutation,
   useGetObrasQuery,
   useGetObraQuery,
-  useGetObrasRelatorioQuery,
+  useGenerateObraRelatorioMutation,
   useFindObrasQuery
 } = obraApi
-
 
 export default obraApi

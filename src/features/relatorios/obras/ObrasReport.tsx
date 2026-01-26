@@ -7,10 +7,12 @@ interface ObrasReportProps {
   obras: ObraEntity[]
   startDate?: string
   endDate?: string
+  tipoObra?: string
+  estante?: string
 }
 
 const ObrasReport = forwardRef<HTMLDivElement, ObrasReportProps>(
-  ({ obras = [], startDate, endDate }, ref) => {
+  ({ obras = [], startDate, endDate, tipoObra, estante }, ref) => {
     const summary = useMemo(() => {
       const totalQuantidadeAtual = obras.reduce((sum, obra) => sum + (obra.quantidadeAtual || 0), 0)
       const totalQuantidade = obras.reduce((sum, obra) => sum + (obra.quantidadeInicial || 0), 0)
@@ -73,6 +75,18 @@ const ObrasReport = forwardRef<HTMLDivElement, ObrasReportProps>(
                 <div className="col-md-4 text-md-end">
                   <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>Período do Relatório</small>
                   <strong className="text-primary" style={{ fontSize: '0.85rem' }}>{displayStartDate} - {displayEndDate}</strong>
+                  {tipoObra && (
+                    <div className="mt-1">
+                      <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>Tipo de Obra</small>
+                      <strong className="text-primary" style={{ fontSize: '0.85rem' }}>{tipoObra}</strong>
+                    </div>
+                  )}
+                  {estante && (
+                    <div className="mt-1">
+                      <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>Estante</small>
+                      <strong className="text-primary" style={{ fontSize: '0.85rem' }}>{estante}</strong>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -139,6 +153,23 @@ const ObrasReport = forwardRef<HTMLDivElement, ObrasReportProps>(
               <div className="col-md-8">
                 <h3 className="text-primary mb-1 fw-bold">Relatório de Obras</h3>
                 <p className="text-muted mb-0 small">Sistema BiblioGere</p>
+                {/* Filters Applied Section */}
+                {(tipoObra || estante) && (
+                  <div className="mt-2 d-flex flex-wrap gap-2">
+                    {tipoObra && (
+                      <span className="badge bg-primary bg-opacity-10 text-primary border border-primary" style={{ fontSize: '0.75rem', fontWeight: '500' }}>
+                        <i className="bi bi-bookmark-fill me-1"></i>
+                        Tipo: {tipoObra}
+                      </span>
+                    )}
+                    {estante && (
+                      <span className="badge bg-success bg-opacity-10 text-success border border-success" style={{ fontSize: '0.75rem', fontWeight: '500' }}>
+                        <i className="bi bi-bookshelf me-1"></i>
+                        Estante: {estante}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="col-md-4 text-md-end">
                 <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>Período do Relatório</small>

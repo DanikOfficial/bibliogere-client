@@ -1,37 +1,31 @@
 import { SetStateAction } from "react";
 import emprestimoApi from "../emprestimo/data/emprestimoApi";
 import { EmprestimoEntity, GenerateEmprestimoRequest, GenerateEmprestimoRequestErrorResponse } from "../emprestimo/data/EmprestimoInterfaces";
-import obraApi from "../obra/data/obraApi"
-import { ObraReportRequest, ObraResponse } from "../obra/data/ObraInterfaces"
+import { ObraReportRequest, ObraReportErrorResponse, ObraResponse } from "../obra/data/ObraInterfaces"
 import { handleErrorResponse } from "@/utils/reusable/ResponseHandler";
 import { ErrorResponse } from "@/app/interfaces/ErrorResponse";
 import Option from "@/app/interfaces/Option";
 
 /**
- *
- * @param dispatch used to initiate query
+ * Send generate obra relatorio request
  * @param request the request to be sent
+ * @param generateObraRelatorio mutation function
  * @param onSuccess in case of success, pass data
- * @param onError in case of error,
+ * @param setUiError in case of error, update error state
  */
-export const sendGerarObraRelatiorioRequest = (
-    dispatch: any,
+export const sendGenerateObraRelatorioRequest = async (
     request: ObraReportRequest,
-    onSuccess: (obraResponse: ObraResponse[]) => void,
-    onError: (errorMessage: string) => void
+    generateObraRelatorio: any,
+    onSuccess: (data: ObraResponse[]) => void,
+    setUiError: React.Dispatch<SetStateAction<ObraReportErrorResponse>>
 ) => {
-    dispatch(obraApi.endpoints.getObrasRelatorio.initiate(request), {
-        forceRefetch: true,
-    })
-        .then((result: any) => {
-            if (result.isError) {
-                onError(result.error.data.message as string);
-                return;
-            } else {
-                onSuccess(result.data);
-            }
-        });
-};
+    try {
+        const response = await generateObraRelatorio(request).unwrap();
+        onSuccess(response);
+    } catch (error) {
+        handleErrorResponse(error as ErrorResponse<ObraReportErrorResponse>, setUiError);
+    }
+}
 
 export const sendGenerateEmprestimoRelatorioRequest = async (
     request: GenerateEmprestimoRequest,
@@ -39,16 +33,13 @@ export const sendGenerateEmprestimoRelatorioRequest = async (
     onSuccess: (data: EmprestimoEntity[]) => void,
     setUiError: React.Dispatch<SetStateAction<GenerateEmprestimoRequestErrorResponse>>
 ) => {
-
     try {
         const response = await generateEmprestimo(request).unwrap();
         onSuccess(response);
     } catch (error) {
-        console.log("Error generating emprestimo report: ", error);
         handleErrorResponse(error as ErrorResponse<GenerateEmprestimoRequestErrorResponse>, setUiError);
     }
 }
-
 
 export const situacaoOptions: Option[] = [
     { label: 'Activo', value: 'Activo' },
