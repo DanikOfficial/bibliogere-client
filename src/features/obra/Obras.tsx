@@ -10,7 +10,7 @@ import UpdateObraModal, {
 const Obras: React.FC = () => {
   const [isUpdateObralModalDisplayed, setIsUpdateObralModalDisplayed] =
     useState<Boolean>(false)
-
+    
   const showUpdateObraModal = () => setIsUpdateObralModalDisplayed(true)
 
   const closeUpdateObraModal = () => setIsUpdateObralModalDisplayed(false)
@@ -28,11 +28,19 @@ const Obras: React.FC = () => {
       {isUpdateObralModalDisplayed && (
         <UpdateObraModal {...updateObraModalProps} />
       )}
-      <SectionName>Gestão de Obras</SectionName>
-      <NovaObra />
-      <SearchSection />
-      <hr />
-      <ObraList {...obraListProps} />
+      <section id="obras-view" className="col pt-3 px-3">
+        <SectionName
+          align="center"
+          withIcon="bi-book"
+          subtitle="Gerencie as obras cadastradas no sistema"
+        >
+          Gestão de Obras
+        </SectionName>
+        <NovaObra />
+        <SearchSection />
+        <hr />
+        <ObraList {...obraListProps} />
+      </section>
     </>
   )
 }

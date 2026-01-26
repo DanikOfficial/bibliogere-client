@@ -54,7 +54,7 @@ export const sendUpdateEstanteRequest = async (
         tipoEstante: estante.tipoEstante,
       },
     }
-    await updateEstante(updateEstanteRequest)
+    await updateEstante(updateEstanteRequest).unwrap()
     onUpdateEstanteSuccess(true)
     dispatch(estanteUpdateCanceled())
   } catch (error: unknown) {

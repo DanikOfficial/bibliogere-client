@@ -6,7 +6,6 @@ import { RootState } from "../../../../app/store";
 
 const logger = Logger.getInstance()
 
-
 const comparer = (
     firstAtendente: AtendenteInfo,
     secondAtendente: AtendenteInfo
@@ -16,8 +15,8 @@ const comparer = (
     return 0
 }
 
-const atendentesAdapter: EntityAdapter<AtendenteInfo> =
-    createEntityAdapter<AtendenteInfo>({
+const atendentesAdapter: EntityAdapter<AtendenteInfo, number> =
+    createEntityAdapter<AtendenteInfo, number>({
         selectId: (atendente) => atendente.codigo,
         sortComparer: comparer,
     })
@@ -43,17 +42,13 @@ const atendenteSlice = createSlice({
         },
         atendenteEnabled: (state, { payload: atendente }: PayloadAction<AtendenteResponse>) => {
             logger.log(`Searching for atendente with codigo ${atendente.codigo}`)
-
-            if (state.all.entities[atendente.codigo]) {
-                logger.log('Atendente found!')
-                logger.log(
-                    `Updating atendente with codigo ${atendente.codigo} with data ${JSON.stringify(atendente)}`
-                )
-                atendentesAdapter.updateOne(state.all, {
-                    id: atendente.codigo,
-                    changes: { isActive: atendente.isActive }
-                })
-            }
+            logger.log(
+                `Updating atendente with codigo ${atendente.codigo} with data ${JSON.stringify(atendente)}`
+            )
+            atendentesAdapter.updateOne(state.all, {
+                id: atendente.codigo,
+                changes: { isActive: atendente.isActive }
+            })
         },
         atendenteDeleted: (
             state,
@@ -62,22 +57,14 @@ const atendenteSlice = createSlice({
             logger.log(
                 `Attempting to delete atendente with the id of ${atendenteCodigo} from the atendenteAdapter`
             )
-
-            const existingAtendente = state.all.entities[atendenteCodigo]
-
-            if (existingAtendente) {
-                logger.log('Found! Deleting')
-                atendentesAdapter.removeOne(state.all, atendenteCodigo)
-            } else {
-                logger.warn('Could not find atendente in the Adapter. Ignoring Deletion!')
-            }
+            atendentesAdapter.removeOne(state.all, atendenteCodigo)
         },
     },
 })
 
 export const { selectAll: selectAllAtendentes, selectById: selectAtendenteById } =
     atendentesAdapter.getSelectors(
-        (state: RootState) => state.atendente.all ?? atendentesAdapter.getInitialState()
+        (state: RootState) => state.atendente.all
     )
 
 export const { atendenteAdded, atendenteDeleted, atendenteEnabled, atendentesAdded } = atendenteSlice.actions

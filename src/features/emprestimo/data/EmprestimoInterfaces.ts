@@ -1,4 +1,6 @@
+import { ApiError } from '@/components/reusable/data/CommonInterfaces'
 import { ObraEntity } from '../../obra/data/ObraInterfaces'
+import Option from '@/app/interfaces/Option'
 
 export interface EmprestimoEntity {
   [key: string]: any
@@ -24,6 +26,37 @@ export interface CreateEmprestimoRequest extends EmprestimoForm {
   obrasIds: number[]
 }
 
+export interface GenerateEmprestimosReportForm {
+  dataInicio: string,
+  dataFim: string,
+  situacaoEmprestimo?: Option
+}
+
+export interface GenerateEmprestimoRequest {
+  dataInicio: string,
+  dataFim: string,
+  situacaoEmprestimo: string
+}
+
+export interface GenerateEmprestimoRequestErrorResponse extends ApiError<GenerateEmprestimoRequest> { }
+
+export const defaulGenerateEmprestimoRequestErrorResponse: GenerateEmprestimoRequestErrorResponse = {
+  error: false,
+  message: '',
+  errors: {
+    dataInicio: '',
+    dataFim: '',
+    situacaoEmprestimo: ""
+  }
+}
+
+export const defaultGenerateEmprestimoFormState: GenerateEmprestimosReportForm = {
+  dataInicio: '',
+  dataFim: '',
+  situacaoEmprestimo: { value: '', label: '' }
+}
+
+
 export interface CreateEmprestimoResponse extends EmprestimoEntity {
   itens: ItemEmprestimoEntity[]
 }
@@ -41,15 +74,13 @@ export interface EmprestimoFormErrorResponse {
 export interface ItemEmprestimoEntity {
   codigo: number
   utente: string
-  utente_contacto: string
-  utente_email: string
   data_devolucao: string
   data_realizacao: string
   situacao: string
   obra: ObraEntity
 }
 
-export interface EmprestimoResponse extends EmprestimoEntity {}
+export interface EmprestimoResponse extends EmprestimoEntity { }
 
 export interface EmprestimoComponentProps {
   emprestimo: EmprestimoEntity

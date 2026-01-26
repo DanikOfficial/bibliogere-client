@@ -20,12 +20,12 @@ const comparer = (
   secondEmprestimo: EmprestimoEntity
 ) => {
   if (firstEmprestimo.codigo < secondEmprestimo.codigo) return 1
-  if (firstEmprestimo.codigo > secondEmprestimo.codigo) return 1
+  if (firstEmprestimo.codigo > secondEmprestimo.codigo) return -1
   return 0
 }
 
-const emprestimosAdapter: EntityAdapter<EmprestimoEntity> =
-  createEntityAdapter<EmprestimoEntity>({
+const emprestimosAdapter: EntityAdapter<EmprestimoEntity, number> =
+  createEntityAdapter<EmprestimoEntity, number>({
     selectId: (emprestimo) => emprestimo.codigo,
     sortComparer: (firstEmprestimo, secondEmprestimo) =>
       comparer(firstEmprestimo, secondEmprestimo),
@@ -46,7 +46,7 @@ const emprestimoSlice = createSlice({
       state,
       { payload: emprestimos }: PayloadAction<EmprestimoEntity[]>
     ) => {
-      logger.log(`Adding fetched obras to the Adapter.`)
+      logger.log(`Adding fetched emprestimos to the Adapter.`)
       emprestimosAdapter.setAll(state.all, emprestimos)
     },
     emprestimoAdded: (
@@ -62,50 +62,37 @@ const emprestimoSlice = createSlice({
       state,
       { payload: emprestimo }: PayloadAction<EmprestimoEntity>
     ) => {
-      logger.log(`Seaching for Emprestimo with codigo ${emprestimo.codigo}`)
-
-      let existingEmprestimo = state.all.entities[emprestimo.codigo]
-
-      if (existingEmprestimo) {
-        logger.log('Emprestimo found!')
-        Object.keys(emprestimo).forEach((key) => {
-          if (existingEmprestimo !== undefined) {
-            existingEmprestimo[key] = emprestimo[key]
-          }
-        })
-      } else {
-        logger.warn(
-          'Could not find Emprestimo in the Adapter. Ignoring Update!'
-        )
-      }
+      logger.log(`Searching for Emprestimo with codigo ${emprestimo.codigo}`)
+      emprestimosAdapter.updateOne(state.all, {
+        id: emprestimo.codigo,
+        changes: emprestimo
+      })
     },
     emprestimoDeleted: (
       state,
       { payload: emprestimoCodigo }: PayloadAction<number>
     ) => {
       logger.log(
-        `Attemping to Deleting obra with the id of ${emprestimoCodigo} from the obraAdapter`
+        `Attempting to delete emprestimo with the id of ${emprestimoCodigo} from the emprestimoAdapter`
       )
-
-      const existingObra = state.all.entities[emprestimoCodigo]
-
-      if (existingObra) {
-        logger.log('Found! Deleting')
-        emprestimosAdapter.removeOne(state.all, emprestimoCodigo)
-      } else {
-        logger.warn('Could not find obra in the Adapter. Ignoring Deletion!')
-      }
+      emprestimosAdapter.removeOne(state.all, emprestimoCodigo)
     },
-    emprestimoSelected: (state, { payload: emprestimo }: PayloadAction<EmprestimoEntity>) => {
-      logger.log(`Setting ${emprestimo} as selected`)
+    emprestimoSelected: (
+      state, 
+      { payload: emprestimo }: PayloadAction<EmprestimoEntity>
+    ) => {
+      logger.log(`Setting ${JSON.stringify(emprestimo)} as selected`)
       state.selectedEntity = emprestimo
       state.isUpdating = true
     }
   },
 })
 
-export const { selectAll: selectAllEmprestimos, selectById: selectEmprestimoById } = emprestimosAdapter.getSelectors(
-  (state: RootState) => state.emprestimo.all ?? emprestimosAdapter.getInitialState()
+export const { 
+  selectAll: selectAllEmprestimos, 
+  selectById: selectEmprestimoById 
+} = emprestimosAdapter.getSelectors(
+  (state: RootState) => state.emprestimo.all
 )
 
 export const {

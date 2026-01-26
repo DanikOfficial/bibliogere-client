@@ -1,27 +1,23 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { store } from './app/store'
 import { Provider } from 'react-redux'
 import { CartProvider } from './features/emprestimo/cart/CartContext'
 import './assets/bootstrap-icons.css'
 import './assets/bootstrap.bundle'
 import './assets/main.min.css'
-import localizacaoApi from './features/localizacoes/localizacaoApi'
 import App from './App'
-import estanteApi from './features/estantes/data/estanteApi'
-import obraApi from './features/obra/data/obraApi'
-import { questaoApi } from './app/services/questaoApi'
 
+const container = document.getElementById('root')
+if (!container) throw new Error('Failed to find the root element')
+const root = createRoot(container)
 
-
-
-ReactDOM.render(
+root.render(
   <React.StrictMode>
     <Provider store={store}>
-        <CartProvider>
-          <App />
-        </CartProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
     </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 )

@@ -18,7 +18,7 @@ const comparer = (firstObra: ObraEntity, secondObra: ObraEntity) => {
   return 0
 }
 
-const obrasAdapter: EntityAdapter<ObraEntity> = createEntityAdapter<ObraEntity>(
+const obrasAdapter: EntityAdapter<ObraEntity, number> = createEntityAdapter<ObraEntity, number>(
   {
     selectId: (obra) => obra.codigo,
     sortComparer: (firstObra, secondObra) => comparer(firstObra, secondObra),
@@ -43,51 +43,33 @@ const obraSlice = createSlice({
     obrasAdded: (state, { payload: obras }: PayloadAction<ObraEntity[]>) => {
       logger.log(`Adding fetched obras to the Adapter.`)
       obrasAdapter.setAll(state.all, obras)
-
     },
     filteredObrasAdded: (state, { payload: obras }: PayloadAction<ObraEntity[]>) => {
-      logger.log(`Adding fetched obras to the Adapter.`)
+      logger.log(`Adding filtered obras to the Adapter.`)
       obrasAdapter.setAll(state.all, obras)
     },
     obraDeleted: (state, { payload: obraCodigo }: PayloadAction<number>) => {
       logger.log(
-        `Attemping to Deleting obra with the id of ${obraCodigo} from the obraAdapter`
+        `Attempting to delete obra with the id of ${obraCodigo} from the obraAdapter`
       )
-
-      const existingObra = state.all.entities[obraCodigo]
-
-      if (existingObra) {
-        logger.log('Found! Deleting')
-        obrasAdapter.removeOne(state.all, obraCodigo)
-      } else {
-        logger.warn('Could not find obra in the Adapter. Ignoring Deletion!')
-      }
+      obrasAdapter.removeOne(state.all, obraCodigo)
     },
     obraUpdated: (state, { payload: obra }: PayloadAction<ObraEntity>) => {
-      logger.log(`Seaching for obra with codigo ${obra.codigo}`)
-
-      let existingObra = state.all.entities[obra.codigo]
-
-      if (existingObra) {
-        logger.log('Obra found!')
-        Object.keys(obra).forEach((key) => {
-          if (existingObra !== undefined) {
-            existingObra[key] = obra[key]
-          }
-        })
-      } else {
-        logger.warn('Could not find obra in the Adapter. Ignoring Update!')
-      }
+      logger.log(`Searching for obra with codigo ${obra.codigo}`)
+      obrasAdapter.updateOne(state.all, {
+        id: obra.codigo,
+        changes: obra
+      })
     },
     obraSelected: (state, { payload: obra }: PayloadAction<ObraForm>) => {
-      logger.log(`Setting ${obra} as selected`)
+      logger.log(`Setting ${JSON.stringify(obra)} as selected`)
       state.selectedEntity = obra
       state.isUpdating = true
     },
     obraUpdateCanceled: (state) => {
       state.selectedEntity = defaultObraFormState
       state.isUpdating = false
-      logger.log(`Cleared the selected Obra for the Slice`)
+      logger.log(`Cleared the selected Obra from the Slice`)
     },
   },
 })
@@ -103,7 +85,7 @@ export const {
 
 export const { selectAll: selectAllObras, selectById: selectObraById } =
   obrasAdapter.getSelectors(
-    (state: RootState) => state.obra.all ?? obrasAdapter.getInitialState()
+    (state: RootState) => state.obra.all
   )
 
 export const isUpdatingObra = (state: RootState) => state.obra.isUpdating

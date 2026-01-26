@@ -1,10 +1,12 @@
-import { api } from '../../features/api/apiSlice'
-import { CreatePasswordRequest, UpdatePasswordRequest } from '../../features/definicoes/data/DefinicoesInterfaces'
-import { AtualizarQuestoesRequest, LoginRequest, LoginResponse, Questoes, ValidarQuestoesRequest, ValidarQuestoesResponse } from '../../features/user/data/userInterfaces'
+import { api } from '../../features/api/baseApi'
+import { BasePasswordRequest, CreatePasswordRequest, UpdatePasswordRequest } from '../../features/definicoes/data/DefinicoesInterfaces'
+import { AtualizarQuestoesRequest, LoginRequest, LoginResponse, Questoes, ValidarQuestoesFromRecoveryRequest, ValidarQuestoesRequest, ValidarQuestoesResponse } from '../../features/user/data/userInterfaces'
 import { atendenteAdded, atendenteDeleted, atendenteEnabled, atendentesAdded } from '../../features/user/management/data/atendenteSlice'
 import { AtendenteRequest, AtendenteResponse } from '../../features/user/management/data/atendenteInterfaces'
 import { AuthState, setCredentials, setUserQuestoes } from '../../features/user/userSlice'
 import Logger from '../../utils/reusable/Logger'
+import { FetchUserQuestoesByUsernameRequest, FetchUserQuestoesByUsernameResponse } from '../../features/user/recovery/data/interfaces'
+import CreatePassword from '../../features/user/common/CreatePassword'
 
 const logger = Logger.getInstance()
 
@@ -20,8 +22,83 @@ export const userApi = api.injectEndpoints({
         const { data } = await queryFulfilled
 
         if (data) {
+          const { codigo, nome, token, permissoes, questoes, isActive, firstLogin: isFirstLogin } = data
+
+          const authState: AuthState = {
+            codigo,
+            currentUser: nome,
+            token,
+            role: permissoes[0],
+            loggedIn: true,
+            questoes,
+            isActive,
+            isFirstLogin
+          }
+
+          dispatch(setCredentials(authState))
+          console.log('Login request successfully sent!')
+        } else {
+          console.warn('Login Request could not be sent!')
+        }
+      }
+
+    }),
+
+    alterarSenha: build.mutation({
+      query: (request: UpdatePasswordRequest) => ({
+        url: `/utilizadores/password/reset/${request.codigoUtilizador}`,
+        method: 'PUT',
+        body: request,
+      }),
+    }),
+
+    createPassword: build.mutation<LoginResponse, CreatePasswordRequest>({
+      query: (request: CreatePasswordRequest) => ({
+        url: `/utilizadores/activate`,
+        body: request,
+        method: 'POST',
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled
+
+          if (data) {
+            console.log("CreatePassword Response:", JSON.stringify(data))
+
+            const { codigo, username, nome, token, permissoes, questoes, isActive, firstLogin } = data
+
+            const authState: AuthState = {
+              codigo,
+              currentUser: nome || username, // Use nome if available, fallback to username
+              token,
+              role: permissoes[0],
+              loggedIn: true,
+              questoes,
+              isActive,
+              isFirstLogin: firstLogin
+            }
+
+            dispatch(setCredentials(authState))
+            console.log('CreatePassword request successfully sent!')
+          }
+        } catch (error) {
+          console.error('CreatePassword failed:', error)
+        }
+      }
+    }),
+
+    ativarUtilizador: build.mutation<LoginResponse, CreatePasswordRequest>({
+      query: (request: CreatePasswordRequest) => ({
+        url: `/admin/utilizadores/activate`,
+        body: request,
+        method: 'POST',
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        const { data } = await queryFulfilled
+
+        if (data) {
           console.log("Login Response: " + JSON.stringify(data))
-          const { codigo, nome, token, permissoes, questoes, isActive, isFirstLogin } = data
+          const { codigo, nome, token, permissoes, questoes, isActive, firstLogin: isFirstLogin } = data
 
           const authState: AuthState = {
             codigo,
@@ -45,30 +122,25 @@ export const userApi = api.injectEndpoints({
           console.warn('Login Request could not be sent!')
         }
       }
-
-    }),
-
-    alterarSenha: build.mutation({
-      query: (request: UpdatePasswordRequest) => ({
-        url: `/utilizadores/password/reset/${request.codigoUtilizador}`,
-        method: 'PUT',
-        body: request,
-      }),
-    }),
-
-    ativarUtilizador: build.mutation({
-      query: (request: CreatePasswordRequest) => ({
-        url: `/admin/utilizadores/activate/${request.codigoUtilizador}`,
-        body: request,
-      }),
     }),
 
     validarQuestoes: build.mutation<ValidarQuestoesResponse, ValidarQuestoesRequest>({
-      query: (validarQuestoesRequest: ValidarQuestoesRequest) => ({
-        url: `/utilizadores/${validarQuestoesRequest.codigoUtilizador}/questoes/validate`,
-        method: 'PUT',
+      query: (validarQuestoesRequest: ValidarQuestoesRequest) => {
+        const { codigoUtilizador, ...body } = validarQuestoesRequest;
+        return {
+          url: `/utilizadores/${codigoUtilizador}/questoes/validate`,
+          method: 'PUT',
+          body
+        };
+      },
+    }),
+
+    validateQuestoesFromRecovery: build.mutation<ValidarQuestoesResponse, ValidarQuestoesFromRecoveryRequest>({
+      query: (validarQuestoesRequest: ValidarQuestoesFromRecoveryRequest) => ({
+        url: `/recovery/utilizadores/questoes/validate`,
+        method: 'POST',
         body: validarQuestoesRequest
-      }),
+      })
     }),
 
     saveQuestoes: build.mutation<Questoes, AtualizarQuestoesRequest>({
@@ -136,6 +208,7 @@ export const userApi = api.injectEndpoints({
         }
       }
     }),
+
     disableAtendente: build.mutation<AtendenteResponse, number>({
       query: (codigoAtendente: number) => ({
         url: `/admin/utilizadores/disable/${codigoAtendente}`,
@@ -151,6 +224,14 @@ export const userApi = api.injectEndpoints({
         }
       }
     }),
+
+    fetchUserQuestoes: build.mutation<FetchUserQuestoesByUsernameResponse, FetchUserQuestoesByUsernameRequest>({
+      query: (request: FetchUserQuestoesByUsernameRequest) => ({
+        url: `/recovery/utilizadores/questoes`,
+        method: 'POST',
+        body: request,
+      })
+    }),
   })
 })
 
@@ -165,5 +246,8 @@ export const {
   useListAtendentesQuery,
   useCreateAtendenteMutation,
   useDeleteAtendenteMutation,
-  useDisableAtendenteMutation
+  useDisableAtendenteMutation,
+  useFetchUserQuestoesMutation,
+  useValidateQuestoesFromRecoveryMutation,
+  useCreatePasswordMutation
 } = userApi

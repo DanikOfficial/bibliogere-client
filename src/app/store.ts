@@ -1,5 +1,5 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
-import { api } from '../features/api/apiSlice'
+import { api } from '../features/api/baseApi'
 import userReducer from '../features/user/userSlice'
 import obraReducer from '../features/obra/data/obraSlice'
 import estanteReducer from '../features/estantes/data/estanteSlice'

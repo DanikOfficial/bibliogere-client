@@ -38,7 +38,6 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
   const [error, setError] = useState<ObraFormErrorResponse>(
     defaultObraFormErrorResponse
   )
-
   const [isCreateObraRequestSuccess, setIsCreateObraRequestSuccess] =
     useState<Boolean>(false)
 
@@ -49,9 +48,7 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
   )
 
   const estanteOptions = renderEstantesOptions(estanteEntities)
-
   const localizacoes = useAppSelector(selectAllLocalizacoes)
-
   const localizacaoOptions = renderLocalizacoes(localizacoes)
 
   const onChangeLocalizacao = (
@@ -70,12 +67,16 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
     name: string,
     value: string | number,
     label: string = EMPTY
-  ) => onChangeTipoObra(setFormState, inputRef, { value, label }, formState)
+  ) => {
+    onChangeTipoObra(setFormState, inputRef, { value, label }, formState)
+  }
 
   const onClickConfirmar = () =>
     sendCreateObraRequest(formState, createObra, setError, (isCreated) => {
       setIsCreateObraRequestSuccess(isCreated)
-      isCreated && clearFormFields()
+      if (isCreated) {
+        clearFormFields()
+      }
       toast.dismiss()
     })
 
@@ -91,41 +92,29 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
     clearFormFields()
   }
 
-  /**
-   * Since there are two dynamic properties which are Tutor and editora
-   * This useEffect controls this properties dynamically, which means,
-   * each time the type of the Obra which is Monografia or Livro is changed
-   * Editora or Tutor property is added to the formState, with its value empty,
-   * this useEffect works in conjuction with onChangeTipo Obra function
-   */
   useEffect(() => {
     const element = inputRef.current as HTMLInputElement
     if (element) {
       const name = element.name
-
       element.value = ''
-
-      // This code must be refactored
       setFormState((prev) => ({
         ...prev,
         [name]: '',
         type: formState.type,
       }))
     }
-
-    // Every time we change the type of the Obra, we must empty the previous estante selected to prevent inconsistencies
     setFormState((prev) => ({ ...prev, estante: EMPTY_OPTION }))
   }, [formState.type])
 
   useEffect(() => {
     if (isLoading) {
       toast.dismiss()
-      toast.loading('Tentando criar nova obra...')
+      toast.loading('Criando obra...')
     } else {
       if (isCreateObraRequestSuccess) {
         toast.dismiss()
         toast.success('Obra criada com sucesso!', {
-          duration: 5000,
+          duration: 3000,
         })
         setIsCreateObraRequestSuccess(false)
       }
@@ -133,170 +122,216 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
   }, [isLoading, isCreateObraRequestSuccess])
 
   return (
-    <>
-      <div
-        className="modal fade modal-custom-bg show d-block"
-        id="gerirObraModal"
-        tabIndex={-1}
-        aria-labelledby="gerirObraLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content custom-radius p-2">
-            <div className="modal-body">
-              <h4
-                className="
-                modal-title
-                text-secondary text-center
-                fw-light
-                mb-3
-              "
-                id="gerirObraLabel"
+    <div
+      className="modal fade modal-custom-bg show d-block"
+      id="gerirObraModal"
+      tabIndex={-1}
+      aria-labelledby="gerirObraLabel"
+      aria-hidden="true"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+    >
+      <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div className="modal-content" style={{ borderRadius: '20px', border: 'none', overflow: 'hidden' }}>
+          {/* Simplified Header */}
+          <div
+            className="position-relative"
+            style={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+              padding: '2rem'
+            }}
+          >
+            <button
+              type="button"
+              className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+              onClick={onClickCancelar}
+              aria-label="Close"
+            ></button>
+
+            <div className="d-flex align-items-center text-white">
+              <div
+                className="d-flex align-items-center justify-content-center rounded-circle bg-white me-3"
+                style={{ width: "60px", height: "60px", flexShrink: 0 }}
               >
-                Registar Nova Obra
-              </h4>
-              {isError && (
-                <span className="text-danger mb-1">
-                  <strong>Erro:</strong> {error.message}
-                </span>
-              )}
+                <i className="bi bi-book-fill" style={{ fontSize: '2rem', color: '#2563eb' }}></i>
+              </div>
+              <div>
+                <h4 className="fw-bold mb-1">Registar Nova Obra</h4>
+                <p className="mb-0 opacity-90">Preencha os dados abaixo para adicionar ao catálogo</p>
+              </div>
+            </div>
+          </div>
 
-              <div id="obra-type">
-                <div className="row">
-                  <div className="col-lg-6">
-                    <ComboBox
-                      id="tipoObra"
-                      label="Tipo de Obra"
-                      value={formState.type}
-                      color="secondary"
-                      options={initialTipoObraOptionsState}
-                      onChange={onChangeTipoDeObra}
-                    />
-                    {!formState.type && (
-                      <span className="text-warning">
-                        Nota: Certifique-se de escolher o tipo de obra!
-                      </span>
-                    )}
-                  </div>
+          {/* Single Form Body */}
+          <div className="modal-body p-4">
+            {isError && (
+              <div className="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert" style={{ borderRadius: '12px' }}>
+                <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                  <strong>Erro ao criar obra:</strong> {error.message}
                 </div>
+              </div>
+            )}
 
-                <hr />
+            {/* Section 1: Tipo de Obra */}
+            <div className="mb-4">
+              <div className="d-flex align-items-center mb-3">
+                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style={{ width: '32px', height: '32px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                  1
+                </div>
+                <h6 className="mb-0 fw-bold text-primary">Tipo de Obra</h6>
               </div>
 
-              <div className="data-and-actions">
-                <div className="row">
-                  <div className="col-lg-12 mb-2">
+              <div className="ps-5">
+                <ComboBox
+                  id="tipoObra"
+                  label="Tipo de Obra *"
+                  value={formState.type}
+                  color="primary"
+                  options={initialTipoObraOptionsState}
+                  onChange={onChangeTipoDeObra}
+                />
+              </div>
+            </div>
+
+            <hr className="my-4" />
+
+            {/* Section 2: Informações Básicas */}
+            <div className="mb-4">
+              <div className="d-flex align-items-center mb-3">
+                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style={{ width: '32px', height: '32px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                  2
+                </div>
+                <h6 className="mb-0 fw-bold text-primary">Informações da Obra</h6>
+              </div>
+
+              <div className="ps-5">
+                <div className="row g-3">
+                  <div className="col-12">
                     <ControlledInput
                       name="titulo"
                       color="primary"
                       value={formState.titulo}
                       id="titulo"
-                      label="Titulo"
+                      label="Título da Obra *"
                       onChange={(event) => onInputChange(event, setFormState)}
-                      placeholder="Titulo da obra"
+                      placeholder="Digite o título completo da obra"
                       error={error.errors?.titulo}
                       type="text"
+                      autoFocus
                     />
                   </div>
-                </div>
-                <div className="row mb-2">
-                  <div className="col-lg-12">
+
+                  <div className="col-md-6">
                     <ControlledInput
                       name="autor"
-                      color="secondary"
+                      color="primary"
                       id="autor"
-                      label="Autor"
+                      label="Autor(es) *"
                       value={formState.autor}
                       onChange={(event) => onInputChange(event, setFormState)}
-                      placeholder="Nome dos autor(es) da obra"
+                      placeholder="Nome completo do(s) autor(es)"
                       error={error.errors?.autor}
                       type="text"
                     />
                   </div>
-                </div>
 
-                <div className={`row ${formState.type.value ? 'mb-2' : ''}`}>
-                  <div className="col-lg-10">
-                    {(formState.type.value as string).toLowerCase() ===
-                      'livro' && (
+                  {formState.type.value && (
+                    <div className="col-md-6">
+                      {(formState.type.value as string).toLowerCase() === 'livro' && (
                         <ControlledInput
                           id="editora"
-                          label="Editora"
+                          label="Editora *"
                           value={formState.editora ?? ''}
-                          color="secondary"
+                          color="primary"
                           name="editora"
                           type="text"
                           error={error.errors?.editora}
                           onChange={(event) => onInputChange(event, setFormState)}
                           reference={inputRef}
-                          placeholder="Editora do livro!"
+                          placeholder="Nome da editora"
                         />
                       )}
 
-                    {(formState.type.value as string).toLowerCase() ===
-                      'monografia' && (
+                      {(formState.type.value as string).toLowerCase() === 'monografia' && (
                         <ControlledInput
                           id="tutor"
-                          label="Tutor"
+                          label="Orientador/Tutor *"
                           value={formState.tutor ?? ''}
-                          color="secondary"
+                          color="primary"
                           name="tutor"
                           type="text"
                           error={error.errors?.tutor}
                           onChange={(event) => onInputChange(event, setFormState)}
                           reference={inputRef}
-                          placeholder="Tutor da Monografia!"
+                          placeholder="Nome do orientador"
                         />
                       )}
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-sm-12 col-md-6 col-lg-5 mb-2">
+                    </div>
+                  )}
+
+                  <div className="col-md-6">
                     <ControlledInput
                       type="number"
                       name="quantidadeInicial"
                       value={formState.quantidadeInicial}
                       error={error.errors?.quantidadeInicial}
-                      color="secondary"
-                      label="Quantidade"
+                      color="primary"
+                      label="Quantidade de Exemplares *"
                       id="quantidade"
                       onChange={(event) => onInputChange(event, setFormState)}
-                      placeholder="Digite a quantidade aqui!"
+                      placeholder="Ex: 5"
                     />
                   </div>
-                  <div className="col-sm-12 col-md-6 col-lg-4 mb-2">
+
+                  <div className="col-md-6">
                     <ControlledInput
                       type="number"
                       name="ano"
                       value={formState.ano}
                       error={error.errors?.ano}
-                      color="secondary"
-                      label="Ano"
+                      color="primary"
+                      label="Ano de Publicação *"
                       id="ano"
                       onChange={(event) => onInputChange(event, setFormState)}
-                      placeholder="Digite o ano aqui!"
+                      placeholder="Ex: 2024"
                     />
                   </div>
                 </div>
-                <div className="row mb-2">
-                  <div className="col-sm-12 col-lg-7">
+              </div>
+            </div>
+
+            <hr className="my-4" />
+
+            {/* Section 3: Localização */}
+            <div className="mb-4">
+              <div className="d-flex align-items-center mb-3">
+                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style={{ width: '32px', height: '32px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                  3
+                </div>
+                <h6 className="mb-0 fw-bold text-primary">Localização Física</h6>
+              </div>
+
+              <div className="ps-5">
+                <div className="row g-3">
+                  <div className="col-md-6">
                     <ComboBox
                       id="estante"
                       label="Estante"
-                      color="secondary"
+                      color="primary"
                       value={formState.estante}
                       name="estante"
                       options={estanteOptions}
                       onChange={onChangeEstante}
                     />
                   </div>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-sm-12 col-lg-7">
+                  <div className="col-md-6">
                     <ComboBox
                       id="localizacao"
                       label="Localização"
-                      color="secondary"
+                      color="primary"
                       name="localizacao"
                       value={formState.localizacao}
                       options={localizacaoOptions}
@@ -304,62 +339,47 @@ const NovaObraModal: React.FC<NovaObraModalProps> = ({ hideModal }) => {
                     />
                   </div>
                 </div>
-                <hr />
-                <div className="row">
-                  <div className="col-12 col-md-6 col-lg-3 mb-3 mb-lg-0">
-                    <button
-                      type="button"
-                      className="
-                      btn
-                      shadow-none
-                      btn-primary
-                      text-light
-                      d-flex
-                      align-items-center
-                      justify-content-center
-                      me-3
-                      w-100
-                    "
-                      onClick={onClickConfirmar}
-                      disabled={isLoading}
-                    >
-                      <span className="me-1">Confirmar</span>
-
-                      <i
-                        className={`bi ${isLoading
-                          ? 'bi-arrow-clockwise rotate'
-                          : 'bi-save text-light'
-                          }`}
-                      ></i>
-                    </button>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-3">
-                    <button
-                      type="button"
-                      className="
-                      btn
-                      shadow-none
-                      btn-danger
-                      text-light
-                      d-flex
-                      align-items-center
-                      justify-content-center
-                      me-3
-                      w-100
-                    "
-                      onClick={onClickCancelar}
-                    >
-                      <span className="me-1">Cancelar</span>
-                      <i className="bi bi-x-square text-light"></i>
-                    </button>
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
+
+          {/* Modal Footer */}
+          <div className="modal-footer border-0 bg-light p-4">
+            <div className="d-flex gap-3 w-100">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-lg"
+                onClick={onClickCancelar}
+                disabled={isLoading}
+                style={{ borderRadius: '12px' }}
+              >
+                <i className="bi bi-x-circle me-2"></i>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary btn-lg flex-grow-1 shadow-sm"
+                onClick={onClickConfirmar}
+                disabled={isLoading}
+                style={{ borderRadius: '12px' }}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle me-2"></i>
+                    Confirmar e Salvar
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

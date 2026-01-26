@@ -8,14 +8,14 @@ import axios from 'axios'
 
 import { RootState } from '../../app/store'
 
-import { api } from '../api/apiSlice'
+import { api } from '../api/baseApi'
 
 export interface Localizacao {
   codigo: number
   designacao: string
 }
 
-export interface LocalizacaoEntity extends Localizacao {}
+export interface LocalizacaoEntity extends Localizacao { }
 
 const localizacoesAdapter = createEntityAdapter<Localizacao>({
   selectId: (response) => {

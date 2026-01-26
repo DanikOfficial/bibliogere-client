@@ -1,4 +1,4 @@
-import { api } from '../../features/api/apiSlice';
+import { api } from '../../features/api/baseApi';
 import { setQuestoes } from '../../features/user/questaoSlice';
 import { Questao } from '../../features/user/data/userInterfaces';
 import toast from 'react-hot-toast';
