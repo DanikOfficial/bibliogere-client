@@ -16,11 +16,10 @@ const Sidebar: React.FC = () => {
   const currentUser = useAppSelector(selectCurrentUser)
   const role = useAppSelector(selectRole)
 
-    const links = useLinks(role.nome)
+  const links = useLinks(role.nome)
 
-  // TODO: REset app state
   const exit = (): void => {
-    dispatch(signOut)
+    dispatch(signOut())
     navigate('/')
   }
 
