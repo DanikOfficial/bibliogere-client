@@ -28,11 +28,27 @@ export interface ObraEntity {
 }
 
 export interface ObraReportRequest {
-  inicio: string
-  fim: string
-  estante?: string
+  dataInicio: string
+  dataFim: string
+  tipoObra?: string
+  nomeEstante?: string
 }
 
+export interface GenerateObraReportForm {
+  dataInicio: string
+  dataFim: string
+  tipoObra: Option
+  estante: Option
+}
+
+export interface ObraReportErrorResponse {
+  error: boolean
+  message: string
+  errors?: {
+    dataInicio: string
+    dataFim: string
+  }
+}
 
 export interface ObraResponse extends ObraEntity { }
 
@@ -133,6 +149,22 @@ export const defaultObraFormErrorResponse: ObraFormErrorResponse = {
     quantidadeInicial: '',
     editora: '',
     tutor: '',
+  },
+}
+
+export const defaultGenerateObraReportFormState: GenerateObraReportForm = {
+  dataInicio: '',
+  dataFim: '',
+  tipoObra: EMPTY_OPTION,
+  estante: EMPTY_OPTION,
+}
+
+export const defaultObraReportErrorResponse: ObraReportErrorResponse = {
+  error: false,
+  message: '',
+  errors: {
+    dataInicio: '',
+    dataFim: '',
   },
 }
 

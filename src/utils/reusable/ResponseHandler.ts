@@ -16,9 +16,6 @@ export const handleErrorResponse = <E extends ErrorResponse<T>, T>(
   setUIErrorState: React.Dispatch<SetStateAction<T>>
 ): void => {
 
-  // Log the entire raw error for debugging
-  console.log("Raw error: ", error)
-
   /**
    * Many libraries (like Axios) wrap the backend error
    * inside `error.response.data`.
@@ -43,8 +40,6 @@ export const handleErrorResponse = <E extends ErrorResponse<T>, T>(
       (error as any).data) ||
     // final fallback for offline errors or unexpected errors
     null
-
-  console.log("Extracted error data: ", extractedData)
 
   if (!extractedData) {
     // 🔥 When the API is OFF, you end up here

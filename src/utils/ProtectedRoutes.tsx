@@ -11,17 +11,13 @@ const ProtectedRoutes: React.FC = () => {
 
   // Get the current path
   const currentPath = location.pathname.replace('/dashboard/', '')
-  console.log("Stripped path:", currentPath);
 
   // Get allowed routes for the user
   const allowedRoutes = linksArr.filter((link) =>
     link.roles.includes(role?.nome || '')
   )
 
-  console.log("Allowed routes for role:", allowedRoutes);
-
   let isAuthorized = allowedRoutes.some((link) => link.path === currentPath)
-  console.log("Is authorized?", isAuthorized);
 
   // Regex for matching paths like /emprestimos/{number}
   const regex = /^emprestimos\/\d+$/
@@ -29,7 +25,6 @@ const ProtectedRoutes: React.FC = () => {
   // Check if the path matches the emprestimos/{number} pattern
   if (!isAuthorized && regex.test(currentPath)) {
     isAuthorized = true
-    console.log("Matched emprestimos regex pattern");
   }
 
   if (!logged) {

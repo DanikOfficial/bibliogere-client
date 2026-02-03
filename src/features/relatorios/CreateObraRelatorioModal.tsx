@@ -1,65 +1,89 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
 import { renderEstantesOptions } from '../estantes/EstanteList/business.logic'
-import { useAppDispatch, useAppSelector } from '@/app/hooks'
-import { selectAllEstantes } from '../estantes/data/estanteSlice'
+import { selectEstantesByTipoEstante } from '../estantes/data/estanteSlice'
 import ComboBox from '@/components/reusable/ComboBox'
-import Option from '@/app/interfaces/Option'
-import { EMPTY } from '@/components/reusable/data/Constants'
+import { EMPTY, EMPTY_OPTION } from '@/components/reusable/data/Constants'
 import { onChangeSelect, onInputChange } from '@/utils/reusable/CommonFormEventsHandler'
-import { sendGerarObraRelatiorioRequest } from './business.logic'
-import { ObraReportRequest } from '../obra/data/ObraInterfaces'
+import { sendGenerateObraRelatorioRequest } from './business.logic'
+import {
+  ObraReportRequest,
+  GenerateObraReportForm,
+  ObraReportErrorResponse,
+  defaultGenerateObraReportFormState,
+  defaultObraReportErrorResponse,
+  initialTipoObraOptionsState
+} from '../obra/data/ObraInterfaces'
+import { useGenerateObraRelatorioMutation } from '../obra/data/obraApi'
 
 interface CreateObraRelatorioModalInterface {
   toggleGerarObraRelatorioModal: () => void
-}
-
-interface GerarObraRelatorioState {
-  dataInicial: string
-  dataFinal: string
-  estante: Option
 }
 
 const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
   toggleGerarObraRelatorioModal,
 }) => {
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
-  const [formState, setFormState] = useState<GerarObraRelatorioState>({
-    dataInicial: '',
-    dataFinal: '',
-    estante: { label: '', value: '' },
-  })
+  const [formState, setFormState] = useState<GenerateObraReportForm>(defaultGenerateObraReportFormState)
+  const [errorState, setErrorState] = useState<ObraReportErrorResponse>(defaultObraReportErrorResponse)
+  const [generateObraRelatorio, { isLoading }] = useGenerateObraRelatorioMutation()
 
-  const [message, setErrorMessage] = useState<string>("")
-
-  const estantesArr = useAppSelector(selectAllEstantes)
-  const estanteOptions = renderEstantesOptions(estantesArr)
+  // Filter estantes based on selected tipoObra
+  const estanteEntities = useSelector((state: RootState) =>
+    selectEstantesByTipoEstante(state, formState.tipoObra.label as string)
+  )
+  const estanteOptions = renderEstantesOptions(estanteEntities)
+  const tipoObraOptions = initialTipoObraOptionsState
 
   const handleGerar = () => {
-    setErrorMessage("") // Clear previous errors
-
     const obraRelatorioRequest: ObraReportRequest = {
-      fim: formState.dataFinal,
-      inicio: formState.dataInicial,
-      ...(formState.estante.label && { estante: formState.estante.label as string }),
+      dataInicio: formState.dataInicio,
+      dataFim: formState.dataFim,
+      ...(formState.tipoObra.value && { tipoObra: formState.tipoObra.value as string }),
+      ...(formState.estante.label && { nomeEstante: formState.estante.label as string }),
     }
 
-    sendGerarObraRelatiorioRequest(dispatch, obraRelatorioRequest, (obraRelatorioResponse) => {
-      navigate('/dashboard/relatorios/obras', { state: { obras: obraRelatorioResponse, startDate: formState.dataInicial, endDate: formState.dataFinal } })
-    }, (errorMessage: string) => {
-      setErrorMessage(errorMessage)
-    })
+    sendGenerateObraRelatorioRequest(
+      obraRelatorioRequest,
+      generateObraRelatorio,
+      (data) => {
+        if (data) {
+          navigate('/dashboard/relatorios/obras', {
+            state: {
+              obras: data,
+              startDate: formState.dataInicio,
+              endDate: formState.dataFim,
+              tipoObra: formState.tipoObra,
+              estante: formState.estante
+            }
+          })
+        }
+      },
+      setErrorState
+    )
   }
 
-  const isFormValid = formState.dataInicial && formState.dataFinal
+  const isFormValid = formState.dataInicio && formState.dataFim
 
   const onChangeEstante = (
     name: string,
     value: string | number,
     label: string = EMPTY
   ) => onChangeSelect(setFormState, name, value, label)
+
+  const onChangeTipoObra = (
+    name: string,
+    value: string | number,
+    label: string = EMPTY
+  ) => onChangeSelect(setFormState, name, value, label)
+
+  // Reset estante when tipoObra changes
+  useEffect(() => {
+    setFormState((prev) => ({ ...prev, estante: EMPTY_OPTION }))
+  }, [formState.tipoObra])
 
   return (
     <>
@@ -93,29 +117,19 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
             <p className="modal-subtitle">Configure os filtros para visualizar o relatório detalhado</p>
           </div>
 
+          {/* Top-level error message */}
+          {(errorState.error || errorState.message) && (
+            <div className="error-banner">
+              <i className="bi bi-exclamation-triangle-fill"></i>
+              <span><strong>Erro:</strong> {errorState.message}</span>
+            </div>
+          )}
+
           {/* Info banner */}
           <div className="info-banner">
             <i className="bi bi-info-circle"></i>
-            <span>Selecione o período e a estante (opcional) para gerar o relatório</span>
+            <span>Selecione o período e os filtros opcionais para gerar o relatório</span>
           </div>
-
-          {/* Error message */}
-          {message && (
-            <div className="error-banner">
-              <i className="bi bi-exclamation-triangle-fill"></i>
-              <div className="error-content">
-                <strong>Erro ao gerar relatório</strong>
-                <span>{message}</span>
-              </div>
-              <button
-                className="error-close-btn"
-                onClick={() => setErrorMessage("")}
-                aria-label="Fechar erro"
-              >
-                <i className="bi bi-x"></i>
-              </button>
-            </div>
-          )}
 
           {/* Form */}
           <div className="modal-form">
@@ -128,36 +142,68 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
 
               <div className="date-inputs-grid">
                 <div className="form-group">
-                  <label htmlFor="dataInicial" className="form-label">
+                  <label htmlFor="dataInicio" className="form-label">
                     <i className="bi bi-calendar-check me-1"></i>
                     Data Inicial
                   </label>
                   <input
                     type="date"
-                    className="form-input"
-                    name="dataInicial"
-                    id="dataInicial"
-                    value={formState.dataInicial}
+                    className={`form-input ${errorState.errors?.dataInicio ? 'input-error' : ''}`}
+                    name="dataInicio"
+                    id="dataInicio"
+                    value={formState.dataInicio}
                     onChange={(e) => onInputChange(e, setFormState)}
                     placeholder="Selecione a data inicial"
                   />
+                  {errorState.errors?.dataInicio && (
+                    <span className="field-error">
+                      <i className="bi bi-exclamation-circle me-1"></i>
+                      {errorState.errors.dataInicio}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="dataFinal" className="form-label">
+                  <label htmlFor="dataFim" className="form-label">
                     <i className="bi bi-calendar-x me-1"></i>
                     Data Final
                   </label>
                   <input
                     type="date"
-                    className="form-input"
-                    name="dataFinal"
-                    id="dataFinal"
-                    value={formState.dataFinal}
+                    className={`form-input ${errorState.errors?.dataFim ? 'input-error' : ''}`}
+                    name="dataFim"
+                    id="dataFim"
+                    value={formState.dataFim}
                     onChange={(e) => onInputChange(e, setFormState)}
                     placeholder="Selecione a data final"
                   />
+                  {errorState.errors?.dataFim && (
+                    <span className="field-error">
+                      <i className="bi bi-exclamation-circle me-1"></i>
+                      {errorState.errors.dataFim}
+                    </span>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Tipo de Obra Section */}
+            <div className="form-section">
+              <div className="section-header">
+                <i className="bi bi-bookmark"></i>
+                <span>Tipo de Obra (Opcional)</span>
+              </div>
+
+              <div className="form-group">
+                <ComboBox
+                  id="tipoObra"
+                  label="Selecione um tipo"
+                  color="primary"
+                  value={formState.tipoObra}
+                  name="tipoObra"
+                  options={tipoObraOptions}
+                  onChange={onChangeTipoObra}
+                />
               </div>
             </div>
 
@@ -188,6 +234,7 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
               type="button"
               className="btn-secondary-custom"
               onClick={toggleGerarObraRelatorioModal}
+              disabled={isLoading}
             >
               <i className="bi bi-x-circle me-2"></i>
               Cancelar
@@ -197,11 +244,20 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
               type="button"
               className="btn-primary-custom"
               onClick={handleGerar}
-              disabled={!isFormValid}
+              disabled={isLoading || !isFormValid}
             >
-              <i className="bi bi-file-earmark-bar-graph me-2"></i>
-              Gerar Relatório
-              <i className="bi bi-arrow-right ms-2"></i>
+              {isLoading ? (
+                <>
+                  <i className="bi bi-arrow-clockwise rotate me-2"></i>
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-file-earmark-bar-graph me-2"></i>
+                  Gerar Relatório
+                  <i className="bi bi-arrow-right ms-2"></i>
+                </>
+              )}
             </button>
           </div>
 
@@ -320,6 +376,25 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
           font-weight: 400;
         }
 
+        .error-banner {
+          margin: 1.5rem 2rem 0;
+          padding: 1rem 1.25rem;
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+          border-left: 4px solid #dc2626;
+          border-radius: 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: #991b1b;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+
+        .error-banner i {
+          font-size: 1.25rem;
+          flex-shrink: 0;
+        }
+
         .info-banner {
           margin: 1.5rem 2rem;
           padding: 1rem 1.25rem;
@@ -336,65 +411,6 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
         .info-banner i {
           font-size: 1.25rem;
           flex-shrink: 0;
-        }
-
-        .error-banner {
-          margin: 1.5rem 2rem;
-          padding: 1rem 1.25rem;
-          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-          border-left: 4px solid #dc2626;
-          border-radius: 0.75rem;
-          display: flex;
-          align-items: flex-start;
-          gap: 0.75rem;
-          color: #991b1b;
-          font-size: 0.9rem;
-          animation: slideDown 0.3s ease-out;
-        }
-
-        .error-banner i.bi-exclamation-triangle-fill {
-          font-size: 1.25rem;
-          flex-shrink: 0;
-          margin-top: 0.125rem;
-        }
-
-        .error-content {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .error-content strong {
-          font-weight: 600;
-          color: #7f1d1d;
-        }
-
-        .error-content span {
-          font-size: 0.875rem;
-          color: #991b1b;
-        }
-
-        .error-close-btn {
-          background: transparent;
-          border: none;
-          color: #991b1b;
-          cursor: pointer;
-          padding: 0.25rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 0.25rem;
-          transition: all 0.2s;
-          flex-shrink: 0;
-        }
-
-        .error-close-btn:hover {
-          background: rgba(153, 27, 27, 0.1);
-        }
-
-        .error-close-btn i {
-          font-size: 1rem;
         }
 
         .modal-form {
@@ -467,6 +483,28 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
           border-color: #cbd5e1;
         }
 
+        .form-input.input-error {
+          border-color: #dc2626;
+        }
+
+        .form-input.input-error:focus {
+          border-color: #dc2626;
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .field-error {
+          display: flex;
+          align-items: center;
+          margin-top: 0.5rem;
+          color: #dc2626;
+          font-size: 0.825rem;
+          font-weight: 500;
+        }
+
+        .field-error i {
+          font-size: 0.875rem;
+        }
+
         .modal-actions {
           display: flex;
           gap: 1rem;
@@ -494,9 +532,14 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
           color: #6b7280;
         }
 
-        .btn-secondary-custom:hover {
+        .btn-secondary-custom:hover:not(:disabled) {
           background: #e5e7eb;
           color: #374151;
+        }
+
+        .btn-secondary-custom:disabled {
+          cursor: not-allowed;
+          opacity: 0.6;
         }
 
         .btn-primary-custom {
@@ -537,6 +580,15 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
           font-size: 1rem;
         }
 
+        .rotate {
+          animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -554,19 +606,6 @@ const CreateObraRelatorioModal: FC<CreateObraRelatorioModalInterface> = ({
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-            max-height: 0;
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 200px;
           }
         }
 
