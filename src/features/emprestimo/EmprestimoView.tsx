@@ -136,7 +136,16 @@ const EmprestimoView: React.FC = () => {
   return (
     <section id="definicoes" className="col pt-3 px-3 position-relative">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <SectionName align='center'>Visualizar Empréstimo</SectionName>
+
+        <div></div>
+
+        <SectionName
+          align="center"
+          withIcon="bi-shield-check"
+          subtitle="Visualizar detalhes do empréstimo selecionado"
+        >
+          Visualizar Empréstimo
+        </SectionName>
 
         <button
           className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"

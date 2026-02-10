@@ -10,25 +10,21 @@ import toast from 'react-hot-toast'
 
 const CartContext = createContext<
   | {
-      obrasCart: ObraEntity[]
-      addObra: (
-        obra: ObraEntity,
-        callback: (isSuccess: boolean) => void
-      ) => void
-      removeObra: (codigo: number) => void
-      totalObras: () => number
-      clearObras: () => void
-    }
+    obrasCart: ObraEntity[]
+    addObra: (
+      obra: ObraEntity,
+      callback: (isSuccess: boolean) => void
+    ) => void
+    removeObra: (codigo: number) => void
+    totalObras: () => number
+    clearObras: () => void
+  }
   | undefined
 >(undefined)
 
 // Provider component
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [obrasCart, setObrasCart] = useState<ObraEntity[]>([])
-
-  useEffect(() => {
-    console.log('Obras ', obrasCart)
-  }, [obrasCart])
 
   const addObra = (newObra: ObraEntity, callback: (isSuccess: boolean) => void) => {
     const obraExists = obrasCart?.find((obra) => obra.codigo === newObra.codigo)

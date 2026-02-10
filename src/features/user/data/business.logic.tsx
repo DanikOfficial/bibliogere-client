@@ -12,7 +12,6 @@ export const sendLoginRequest = async (
 ) => {
     try {
         const response = await login(request).unwrap()
-        console.log("Response ", response)
         onLoginSuccess(response)
     } catch (error: unknown) {
         handleErrorResponse(

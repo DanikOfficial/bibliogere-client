@@ -32,8 +32,8 @@ const CreateEmprestimoRelatorioModal: FC<CreateEmprestimoRelatorioModalInterface
       if (data) {
         navigate('/dashboard/relatorios/emprestimos', {
           state: {
-            dataInicio: formState.dataInicio,
-            dataFim: formState.dataFim,
+            startDate: formState.dataInicio,
+            endDate: formState.dataFim,
             situacao: formState.situacaoEmprestimo,
             emprestimos: data
           }

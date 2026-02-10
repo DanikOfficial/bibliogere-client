@@ -26,7 +26,7 @@ const initialState = localizacoesAdapter.getInitialState()
 export const localizacaoApi = api.injectEndpoints({
   endpoints: (build) => ({
     getLocalizacoes: build.query<EntityState<Localizacao, number>, void>({
-      query: () => '/api/v1/localizacoes',
+      query: () => 'localizacoes',
       transformResponse: (response: Localizacao[]) => {
         return localizacoesAdapter.setAll(initialState, response)
       },
@@ -50,5 +50,6 @@ export const { selectAll: selectAllLocalizacoes } =
   )
 
 export const { useGetLocalizacoesQuery } = localizacaoApi
+
 
 export default localizacaoApi

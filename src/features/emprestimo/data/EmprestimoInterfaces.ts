@@ -7,7 +7,8 @@ export interface EmprestimoEntity {
   codigo: number
   utente: string
   contacto: string
-  email: string
+  email: string,
+  multa: number
   itens?: ItemEmprestimoEntity[]
 }
 
